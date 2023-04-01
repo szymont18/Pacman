@@ -8,7 +8,7 @@ class MapElement:
     def __init__(self,POS_X,POS_Y,FIELD_SIZE,C_CHECKER,MAP):
         self.POS_X = POS_X
         self.POS_Y = POS_Y
-        self.SOLID_AREA = pygame.Rect(5,5,FIELD_SIZE-10,FIELD_SIZE-10)
+        self.SOLID_AREA = pygame.Rect(5, 5, FIELD_SIZE-10, FIELD_SIZE-10)
         self._C_CHECKER = C_CHECKER
         self._MAP = MAP
         self._direction = Direction.RIGHT

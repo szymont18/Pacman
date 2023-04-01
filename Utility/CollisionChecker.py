@@ -5,12 +5,12 @@ from Utility.PairRowCol import PairRowCol
 
 
 class CollisionChecker:
-    def __init__(self,ENGINE,MAP):
+    def __init__(self, ENGINE,MAP):
         self.__ENGINE = ENGINE
         self.__MAP = MAP
 
-    #zwraca informacje czy dany element moze sie poruszyc w kierunku direction
-    def can_move(self,element: MapElement,direction: Direction):
+    #Zwraca informacje czy dany element moze sie poruszyc w kierunku direction
+    def can_move(self, element: MapElement, direction: Direction):
         if direction == None:
             return False
 
@@ -20,8 +20,8 @@ class CollisionChecker:
         element_top_y = element.get_pos_y() + element.SOLID_AREA.y
         element_bottom_y = element.get_pos_y() + element.SOLID_AREA.y + element.SOLID_AREA.height
 
-        #Translacja powyzszych wartosci na kolumny
-        element_left_col = element_left_x//self.__ENGINE.FIELD_SIZE
+        #Translacja powyzszych wartosci na kolumny (Pacmana)
+        element_left_col = element_left_x // self.__ENGINE.FIELD_SIZE
         element_right_col = element_right_x // self.__ENGINE.FIELD_SIZE
 
         element_top_row = element_top_y//self.__ENGINE.FIELD_SIZE
@@ -32,9 +32,12 @@ class CollisionChecker:
                 element_top_row = (element_top_y - 3*element.get_speed())//self.__ENGINE.FIELD_SIZE
             else: element_top_row = (element_top_y - element.get_speed())//self.__ENGINE.FIELD_SIZE
 
+            element_top_row = element_top_row % self.__MAP.MAX_ROW
+
+
             #Czy mozna wykonac ruch
-            if (self.__MAP.get_collision_status(element_top_row,element_left_col) or
-                self.__MAP.get_collision_status(element_top_row,element_right_col)):
+            if (self.__MAP.get_collision_status(element_top_row, element_left_col) or
+                self.__MAP.get_collision_status(element_top_row, element_right_col)):
                 return False
 
         elif direction == Direction.DOWN:
@@ -42,6 +45,8 @@ class CollisionChecker:
                 element_bottom_row = (element_bottom_y + 3 * element.get_speed()) // self.__ENGINE.FIELD_SIZE
             else:
                 element_bottom_row = (element_bottom_y + element.get_speed()) // self.__ENGINE.FIELD_SIZE
+
+            element_bottom_row = element_bottom_row % self.__MAP.MAX_ROW
 
             # Czy mozna wykonac ruch
             if (self.__MAP.get_collision_status(element_bottom_row, element_left_col) or
@@ -54,6 +59,8 @@ class CollisionChecker:
             else:
                 element_left_col = (element_left_x - element.get_speed()) // self.__ENGINE.FIELD_SIZE
 
+            element_left_col = element_left_col % self.__MAP.MAX_COL
+
             # Czy mozna wykonac ruch
             if (self.__MAP.get_collision_status(element_top_row, element_left_col) or
                     self.__MAP.get_collision_status(element_bottom_row, element_left_col)):
@@ -64,6 +71,8 @@ class CollisionChecker:
                 element_right_col = (element_right_x + 3 * element.get_speed()) // self.__ENGINE.FIELD_SIZE
             else:
                 element_right_col = (element_right_x + element.get_speed()) // self.__ENGINE.FIELD_SIZE
+
+            element_right_col = element_right_col % self.__MAP.MAX_COL
 
             # Czy mozna wykonac ruch
             if (self.__MAP.get_collision_status(element_top_row, element_right_col) or
@@ -93,8 +102,6 @@ class CollisionChecker:
 
             item1 = self.__MAP.get_items().get(para1)
             item2 = self.__MAP.get_items().get(para2)
-
-
 
             if item1 != None and element.SOLID_AREA.contains(item1.SOLID_AREA):
                 return item1

@@ -8,8 +8,7 @@ class KeyHandler:
         self.left_pressed = False
         self.right_pressed = False
 
-
-    def key_pressed(self,e : pygame.event):
+    def key_pressed(self, e : pygame.event):
         if e.key == pygame.K_w or e.key == pygame.K_UP:
             self.up_pressed = True
         if e.key == pygame.K_s or e.key == pygame.K_DOWN:
@@ -19,7 +18,7 @@ class KeyHandler:
         if e.key == pygame.K_d or e.key == pygame.K_RIGHT:
             self.right_pressed = True
 
-    def key_released(self,e):
+    def key_released(self,e: pygame.event):
         if e.key == pygame.K_w or e.key == pygame.K_UP:
             self.up_pressed = False
         if e.key == pygame.K_s or e.key == pygame.K_DOWN:

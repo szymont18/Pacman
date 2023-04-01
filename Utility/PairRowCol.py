@@ -4,9 +4,9 @@ class PairRowCol:
         self.COL = col
 
     def __eq__(self, other):
-        if not isinstance(other,PairRowCol): return False
+        if not isinstance(other, PairRowCol): return False
         return self.ROW == other.ROW and self.COL == other.COL
 
     def __hash__(self):
-        return hash((self.ROW,self.COL))
+        return hash((self.ROW, self.COL))
 

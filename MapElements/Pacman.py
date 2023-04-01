@@ -1,6 +1,7 @@
 from MapElements.MapElement import MapElement
 from Enums import Direction as Direction
 from Enums.Direction import *
+import pygame
 
 class Pacman(MapElement):
     def __init__(self,POS_X,POS_Y,FIELD_SIZE,KEY_HANDLER,C_CHECKER,MAP,ENGINE):
@@ -12,13 +13,14 @@ class Pacman(MapElement):
         #informacje gdzie skrecic gdy nadazy sie taka mozliwosc
         self.__next_turn = None #Docelowo przechowuje Direction
 
+
     #Override
     def __str__(self):
         return "P "+self._direction.__str__()
 
     #Override
     def get_image_path(self):
-        if(self._direction == Direction.UP):
+        if (self._direction == Direction.UP):
             return "resources/pacman/P_up_1.png"
         elif self._direction == Direction.DOWN:
             return "resources/pacman/P_down_1.png"
@@ -56,12 +58,17 @@ class Pacman(MapElement):
         #Tutaj nastepuje ruszenie pacmana
         if self._direction == Direction.UP:
             self.POS_Y -= self._speed
+            self.POS_Y = self.POS_Y % (self._MAP.MAX_COL * self._MAP.FIELD_SIZE)
         elif self._direction == Direction.DOWN:
             self.POS_Y += self._speed
+            self.POS_Y = self.POS_Y % (self._MAP.MAX_COL * self._MAP.FIELD_SIZE)
         elif self._direction == Direction.LEFT:
             self.POS_X -= self._speed
+            self.POS_X = self.POS_X % (self._MAP.MAX_ROW * self._MAP.FIELD_SIZE)
         else:
             self.POS_X += self._speed
+            self.POS_X = self.POS_X % (self._MAP.MAX_ROW * self._MAP.FIELD_SIZE)
+
 
         #Po ruchu sprawdzamy czy weszlismy na item
         item = self._C_CHECKER.check_for_items(self)

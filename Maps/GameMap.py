@@ -51,9 +51,9 @@ class GameMap(ABC):
     def load_items(self):
         pass
 
-    def get_collision_status(self,row:int,col:int):
-        if row < 0 or row > self.MAX_ROW or col < 0 or col > self.MAX_COL:
-            raise Exception("Wspolrzedne poza mapa w get_collision_status")
+    def get_collision_status(self, row:int, col:int):
+        # if row < 0 or row > self.MAX_ROW or col < 0 or col > self.MAX_COL:
+        #     raise Exception("Wspolrzedne poza mapa w get_collision_status")
         return self._TILES[row][col].COLLISION
 
     def get_items(self):

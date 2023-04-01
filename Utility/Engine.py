@@ -53,6 +53,7 @@ class Engine(object):
                 elif event.type == pygame.KEYUP:
                     self.__KEYH.key_released(event)
 
+            # (???)
             self.__tps_delta += self.__tps_clock.tick() / 1000.0
             while self.__tps_delta > 1 / self.TPS:
                 self.update()
@@ -72,9 +73,9 @@ class Engine(object):
         self.__APP.draw_map_element(self.__pacman)
 
     def picked_up(self,item:Item):
-        if isinstance(item,Dot):
-            self.__dots_eaten +=1
-        elif isinstance(item,RedBall):
+        if isinstance(item, Dot):
+            self.__dots_eaten += 1
+        elif isinstance(item, RedBall):
             self.__score += 10000
 
     def spawn_bonus(self): #respi pieniazki, serduszki
