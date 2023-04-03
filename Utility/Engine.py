@@ -13,9 +13,9 @@ class Engine(object):
         #STALE
         self.TPS = 120 #tickrate
         self.STARTING_LIVES = 3
-        self.MAX_ENEMIES_ALIVE = 4 #Gdy __enemies_alive == MAX_ENEMIES_ALIVE to potwory sie nie respia
-        self.BONUS_APEAR_TIME = 3600 #Co 30 sekund (3600/TPS) pojawia sie na mapie losowy bonus
-        self.BONUS_DISAPEAR_TIME = 1200 #Po 10 sekundach jesli nie podniesiony - znika
+        self.MAX_ENEMIES_ALIVE = 4 # Gdy __enemies_alive == MAX_ENEMIES_ALIVE to potwory sie nie respia
+        self.BONUS_APEAR_TIME = 3600 # Co 30 sekund (3600/TPS) pojawia sie na mapie losowy bonus
+        self.BONUS_DISAPEAR_TIME = 1200 # Po 10 sekundach jesli nie podniesiony - znika
         self.__tps_delta = 0.0
         self.__tps_clock = pygame.time.Clock()
 
@@ -24,8 +24,8 @@ class Engine(object):
         self.__score = 0
         self.__dots_eaten = 0
         self.__enemies_alive = 0
-        self.__keep_running = True #czy silnik ma dalej pracowac
-        self.__pacman = None #uchwyt do pacmana
+        self.__keep_running = True # czy silnik ma dalej pracowac
+        self.__pacman = None # uchwyt do pacmana
 
         self.__APP = APP
         self.MAX_COL = MAX_COL
@@ -36,24 +36,22 @@ class Engine(object):
         self.spawn_pacman(KEYH)
         self.__KEYH = KEYH
 
-
-    def spawn_pacman(self,KEYH):
+    def spawn_pacman(self, KEYH):
         spawn_x = self.__MAP.get_pacman_spawn_x()
         spawn_y = self.__MAP.get_pacman_spawn_y()
 
-        self.__pacman = Pacman(spawn_x,spawn_y,self.FIELD_SIZE,KEYH,self.__C_CHECKER, self.__MAP, self)
+        self.__pacman = Pacman(spawn_x, spawn_y, self.FIELD_SIZE, KEYH, self.__C_CHECKER, self.__MAP, self)
 
     def run(self):
         while self.__keep_running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    sys.exit(0)  # potem mozna przerobic zeby wolalo metode z app
+                    sys.exit(0)  # potem mozna przerobic zeby wolalo metode Menu
                 elif event.type == pygame.KEYDOWN:
                     self.__KEYH.key_pressed(event)
                 elif event.type == pygame.KEYUP:
                     self.__KEYH.key_released(event)
 
-            # (???)
             self.__tps_delta += self.__tps_clock.tick() / 1000.0
             while self.__tps_delta > 1 / self.TPS:
                 self.update()

@@ -5,7 +5,7 @@ from Utility.Engine import *
 from MapElements.MapElement import *
 from Maps.GameMap import *
 from Maps.Level01 import *
-
+from Enums.TileType import *
 
 class App:
     def __init__(self):
@@ -19,6 +19,8 @@ class App:
 
         # Okno
         self.window = pygame.display.set_mode((self.MAX_COL * self.FIELD_SIZE, self.MAX_ROW * self.FIELD_SIZE))
+
+
 
         # LISTENER
         self.__KEYH = KeyHandler()
@@ -44,9 +46,17 @@ class App:
 
     # metoda do narysowania mapy (mapa jest przechowywana jako obraz)
     def draw_map(self, map: GameMap):
-        image = self.__TEXTURE_FACTORY.load(map.get_image_path())
-        image_adjusted = pygame.transform.scale(image, (self.FIELD_SIZE * self.MAX_ROW, self.FIELD_SIZE * self.MAX_COL))
-        self.window.blit(image_adjusted, (0, 0))
+        # image = self.__TEXTURE_FACTORY.load(map.get_image_path())
+        # image_adjusted = pygame.transform.scale(image, (self.FIELD_SIZE * self.MAX_ROW, self.FIELD_SIZE * self.MAX_COL))
+        # self.window.blit(image_adjusted, (0, 0))
+
+        for row in range(self.MAX_ROW):
+            for col in range(self.MAX_COL):
+                x, y = col * self.FIELD_SIZE, row * self.FIELD_SIZE
+                if map.TILES[row][col].TYPE == TileType.WALL:
+                    self.window.blit(map._wall_image, (x, y))
+                else:
+                    self.window.blit(map._void_image, (x, y))
 
     def draw_items(self, map: GameMap):
         items: dict() = map.get_items()

@@ -22,7 +22,7 @@ class Level01(GameMap):
     def load_items(self):
         for i in range(self.MAX_ROW):
             for j in range(self.MAX_COL):
-                if self._TILES[i][j].TYPE == TileType.VOID:
+                if self.TILES[i][j].TYPE == TileType.VOID:
                     para = PairRowCol(i,j)
                     self._items[para] = Dot(j*self.FIELD_SIZE,i*self.FIELD_SIZE)
         redDotPositions = [PairRowCol(1,1),

@@ -5,7 +5,7 @@ import pygame
 
 class Pacman(MapElement):
     def __init__(self,POS_X,POS_Y,FIELD_SIZE,KEY_HANDLER,C_CHECKER,MAP,ENGINE):
-        super().__init__(POS_X,POS_Y,FIELD_SIZE,C_CHECKER,MAP)
+        super().__init__(POS_X, POS_Y, FIELD_SIZE, C_CHECKER, MAP)
         self.__KEY_HANDLER = KEY_HANDLER
         self.__ENGINE = ENGINE
 
@@ -52,7 +52,7 @@ class Pacman(MapElement):
             self._direction = self.__next_turn #pacman skreca
             self.__next_turn = None #wykorzystal skret
 
-            if self._C_CHECKER.can_move(self,self._direction): #jesli pacman moze isc w nowym kierunku
+            if self._C_CHECKER.can_move(self, self._direction): #jesli pacman moze isc w nowym kierunku
                 self.set_speed(self.MAX_SPEED)  # wprawiamy pacmana w ruch
 
         #Tutaj nastepuje ruszenie pacmana
@@ -78,8 +78,6 @@ class Pacman(MapElement):
             self._MAP.remove_item(item) #usuwamy item z mapy aby sie nie wyswietlal
             self.__ENGINE.picked_up(item) #informujemy silnik zeby uruchomil bonusy podniesionego przedmiotu
 
-        else:
-            print("No item")
 
 
 
