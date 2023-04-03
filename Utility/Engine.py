@@ -52,6 +52,7 @@ class Engine(object):
         while self.__keep_running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    pygame.quit()
                     sys.exit(0)  # potem mozna przerobic zeby wolalo metode Menu
                 elif event.type == pygame.KEYDOWN:
                     self.__KEYH.key_pressed(event)
@@ -83,6 +84,7 @@ class Engine(object):
         self.__APP.draw_map(self.__MAP)
         self.__APP.draw_items(self.__MAP)
         self.__APP.draw_map_element(self.__pacman)
+        self.__APP.draw_pacman_status(self.__lives, self.__score)
 
     def picked_up(self, item: Item):
         if isinstance(item, Dot):
@@ -94,9 +96,9 @@ class Engine(object):
         elif isinstance(item, BonusMoney):
             self.__score += 10_000
 
-        print("Actual lifes = ", self.__lives)
-        print("Dots_eaten = ", self.__dots_eaten)
-        print("Score = ", self.__score)
+        # print("Actual lifes = ", self.__lives)
+        # print("Dots_eaten = ", self.__dots_eaten)
+        # print("Score = ", self.__score)
 
     def random_choice(self, prob: int):
         prob = 100 * prob
@@ -113,6 +115,7 @@ class Engine(object):
 
                 new_bonus.set_activity(True)
                 self.__MAP.add_item(new_bonus)
+                return
 
 
 

@@ -13,7 +13,7 @@ class TextureFactory:
             image = self.images.get(path)
             return image
         else:
-            image = pygame.transform.scale(pygame.image.load(path), (48, 48))
+            image = pygame.transform.scale(pygame.image.load(path), (42, 42))
             self.images[path] = image
             return image
 

@@ -1,0 +1,15 @@
+Dodane:
+Serduszka i score na dole
+Spawnowanie się itemków ( na podstawie z góry ustalonego prawdopodobieństwa)
+W paru klasach dodałem potrzebne mi pola ( możemy je później najwyżej gdzieś 	przenieść)
+
+Zmienione:
+Wykrywanie przeszkód ( teraz Pacman się nie zakopuje )
+Chodzenie Pacmana ( może chodzić po całej mapce - teleportuje się z lewej do prawej)
+Rozmiar mapki ( zmniejszona żeby ten pasek na dole się zmieścił )
+Rysowanie mapki ( mapka rysowana jest Tile po Tile, bo się nie zacina i tak, a 	łatwiej mi to będzie ogarnąć później jak mapki będą większe niż ekran
+
+Usunięto:
+Klasa RowColPair (teraz hashmapa _items indeksowana po prostu krotką (row, col)
+
+Chyba o niczym nie zapomiałem

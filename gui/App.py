@@ -13,12 +13,16 @@ class App:
         # W przyszłości sparameryzowanie tych wartości w zależności od mapki
         self.MAX_ROW = 17
         self.MAX_COL = 17
-        self.FIELD_SIZE = 48
+        self.FIELD_SIZE = 42
 
         # Tutaj miejsce na sceny itp
 
         # Okno
-        self.window = pygame.display.set_mode((self.MAX_COL * self.FIELD_SIZE, self.MAX_ROW * self.FIELD_SIZE))
+        self.window = pygame.display.set_mode((self.MAX_COL * self.FIELD_SIZE, (self.MAX_ROW + 2) * self.FIELD_SIZE))
+
+        # Czcionka
+        pygame.font.init()
+        self.font = pygame.font.SysFont(None, self.FIELD_SIZE)
 
         # LISTENER
         self.__KEYH = KeyHandler()
@@ -72,6 +76,21 @@ class App:
 
         for key in keys_to_removed:
             items.pop(key)
+
+    def draw_pacman_status(self, lives_number: int, score_number: int):
+        start_hearth_position = (10, self.MAX_ROW * self.FIELD_SIZE) # 10 to offset ( powinno być sparametryzowane?)
+        print("Draw pacman status", lives_number, score_number)
+        for i in range(min(lives_number, 5)): # Maksymalnie 5 życ pokazanych
+            self.window.blit(self.__TEXTURE_FACTORY.load("resources/items/BonusLife1.png"), start_hearth_position)
+            start_hearth_position = (start_hearth_position[0] + self.FIELD_SIZE, start_hearth_position[1])
+
+        if lives_number > 5:
+            img = self.font.render("...", True, "white")
+            self.window.blit(img, start_hearth_position)
+
+        score_img = self.font.render("SCORE: " + str(score_number), True, "white")
+        self.window.blit(score_img, (self.MAX_COL * (self.FIELD_SIZE - 15), self.MAX_ROW * self.FIELD_SIZE))
+
 
     def launch_game(self):
         game_map = Level01(self.MAX_ROW, self.MAX_COL, self.FIELD_SIZE)
