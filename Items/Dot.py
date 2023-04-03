@@ -1,6 +1,7 @@
 from Items.Item import Item
 import pygame
 
+
 class Dot(Item):
     def __init__(self,POS_X,POS_Y):
         SOLID_AREA = pygame.Rect(23,23,2,2)

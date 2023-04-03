@@ -3,7 +3,6 @@ from Maps import Tile
 from Maps.Tile import Tile
 from Parsers.TileTypeParse import *
 from Items.Item import *
-from Utility.PairRowCol import *
 import pygame
 
 
@@ -17,6 +16,8 @@ class GameMap(ABC):
         self.TILES = [[None for __ in range(self.MAX_COL)] for _ in range(self.MAX_ROW)]
         self.TILES[0][5] = 5
         self._items = dict()
+        self.bonus_probability = dict()
+
 
         # Do rysowania
         self._void_image = pygame.transform.scale(pygame.image.load("resources/tiles/void.png"),
@@ -67,10 +68,17 @@ class GameMap(ABC):
         return self._items
 
     def remove_item(self,item : Item):
-        para = PairRowCol(item.POS_Y/self.FIELD_SIZE, item.POS_X/self.FIELD_SIZE)
+        # para = PairRowCol(item.POS_Y/self.FIELD_SIZE, item.POS_X/self.FIELD_SIZE)
 
-        if self._items.__contains__(para):
-            self._items.pop(para)
+        item_coord = (item.POS_Y / self.FIELD_SIZE, item.POS_X/self.FIELD_SIZE)
+
+        if item_coord in self._items:
+            self._items.pop(item_coord)
+
+    def add_item(self, item: Item):
+        item_coord = (item.POS_Y / self.FIELD_SIZE, item.POS_X / self.FIELD_SIZE)
+        self._items[item_coord] = item
+
 
 
 

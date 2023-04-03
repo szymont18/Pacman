@@ -1,10 +1,15 @@
+import time
+
 import pygame,sys
+
+from Items.BonusLife import BonusLife
+from Items.BonusMoney import BonusMoney
 from Utility.CollisionChecker import *
 from MapElements.Pacman import Pacman
 from Items.Item import Item
 from Items.Dot import Dot
 from Items.RedBall import RedBall
-
+from random import randint
 
 class Engine(object):
     def __init__(self,MAP,MAX_ROW,MAX_COL,APP,KEYH,FIELD_SIZE):
@@ -32,7 +37,7 @@ class Engine(object):
         self.MAX_ROW = MAX_ROW
         self.__MAP = MAP
         self.FIELD_SIZE = FIELD_SIZE
-        self.__C_CHECKER = CollisionChecker(self,self.__MAP) #mechanizm odpowiadajacy za wykrywanie kolizji i podnoszenie przedmiotow
+        self.__C_CHECKER = CollisionChecker(self, self.__MAP) # mechanizm odpowiadajacy za wykrywanie kolizji i podnoszenie przedmiotow
         self.spawn_pacman(KEYH)
         self.__KEYH = KEYH
 
@@ -43,6 +48,7 @@ class Engine(object):
         self.__pacman = Pacman(spawn_x, spawn_y, self.FIELD_SIZE, KEYH, self.__C_CHECKER, self.__MAP, self)
 
     def run(self):
+        time_keeper, last_time = 0, time.time()
         while self.__keep_running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -53,9 +59,17 @@ class Engine(object):
                     self.__KEYH.key_released(event)
 
             self.__tps_delta += self.__tps_clock.tick() / 1000.0
+            time_keeper += self.__tps_clock.tick() / 1000.0
+
             while self.__tps_delta > 1 / self.TPS:
+
                 self.update()
                 self.__tps_delta -= 1 / self.TPS
+
+            time_keeper = time.time()
+            if time_keeper - last_time > 5:
+                last_time = time.time()
+                self.spawn_bonus()
 
             # Drawing
             self.draw()
@@ -70,13 +84,36 @@ class Engine(object):
         self.__APP.draw_items(self.__MAP)
         self.__APP.draw_map_element(self.__pacman)
 
-    def picked_up(self,item:Item):
+    def picked_up(self, item: Item):
         if isinstance(item, Dot):
             self.__dots_eaten += 1
         elif isinstance(item, RedBall):
-            self.__score += 10000
+            self.__score += 100
+        elif isinstance(item, BonusLife):
+            self.__lives += 1
+        elif isinstance(item, BonusMoney):
+            self.__score += 10_000
+
+        print("Actual lifes = ", self.__lives)
+        print("Dots_eaten = ", self.__dots_eaten)
+        print("Score = ", self.__score)
+
+    def random_choice(self, prob: int):
+        prob = 100 * prob
+        choice = randint(1, 101)
+        if choice <= prob:
+            return True
+        return False
 
     def spawn_bonus(self): #respi pieniazki, serduszki
-        pass
+        for bonus_type, information in self.__MAP.bonus_probability.items():
+            probability, coordinates = information
+            if self.random_choice(probability):
+                new_bonus = bonus_type(coordinates[1], coordinates[0], probability)
+
+                new_bonus.set_activity(True)
+                self.__MAP.add_item(new_bonus)
+
+
 
 

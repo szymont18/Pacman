@@ -1,7 +1,6 @@
 from MapElements import MapElement
 from Enums import Direction as Direction
 from Enums.Direction import *
-from Utility.PairRowCol import PairRowCol
 
 
 class CollisionChecker:
@@ -97,8 +96,8 @@ class CollisionChecker:
         direction = element.get_direction()
 
         if direction == Direction.UP:
-            para1 = PairRowCol(element_top_row,element_left_col)
-            para2 = PairRowCol(element_top_row,element_right_col)
+            para1 = (element_top_row, element_left_col)
+            para2 = (element_top_row, element_right_col)
 
             item1 = self.__MAP.get_items().get(para1)
             item2 = self.__MAP.get_items().get(para2)
@@ -109,8 +108,8 @@ class CollisionChecker:
                 return item2
 
         elif direction == Direction.DOWN:
-            para1 = PairRowCol(element_bottom_row,element_left_col)
-            para2 = PairRowCol(element_bottom_row,element_right_col)
+            para1 = (element_bottom_row, element_left_col)
+            para2 = (element_bottom_row, element_right_col)
 
             item1 = self.__MAP.get_items().get(para1)
             item2 = self.__MAP.get_items().get(para2)
@@ -122,8 +121,8 @@ class CollisionChecker:
                 return item2
 
         elif direction == Direction.LEFT:
-            para1 = PairRowCol(element_top_row,element_left_col)
-            para2 = PairRowCol(element_bottom_row,element_left_col)
+            para1 = (element_top_row,element_left_col)
+            para2 = (element_bottom_row,element_left_col)
 
             item1 = self.__MAP.get_items().get(para1)
             item2 = self.__MAP.get_items().get(para2)
@@ -135,8 +134,8 @@ class CollisionChecker:
                 return item2
 
         elif direction == Direction.RIGHT:
-            para1 = PairRowCol(element_top_row,element_right_col)
-            para2 = PairRowCol(element_bottom_row,element_right_col)
+            para1 = (element_top_row, element_right_col)
+            para2 = (element_bottom_row, element_right_col)
 
             item1 = self.__MAP.get_items().get(para1)
             item2 = self.__MAP.get_items().get(para2)

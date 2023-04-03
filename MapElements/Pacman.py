@@ -73,10 +73,10 @@ class Pacman(MapElement):
         #Po ruchu sprawdzamy czy weszlismy na item
         item = self._C_CHECKER.check_for_items(self)
 
-        if item != None:
+        if item != None and item.is_active:
             print("Picked up")
-            self._MAP.remove_item(item) #usuwamy item z mapy aby sie nie wyswietlal
-            self.__ENGINE.picked_up(item) #informujemy silnik zeby uruchomil bonusy podniesionego przedmiotu
+            self._MAP.remove_item(item) # usuwamy item z mapy aby sie nie wyswietlal
+            self.__ENGINE.picked_up(item) # informujemy silnik zeby uruchomil bonusy podniesionego przedmiotu
 
 
 

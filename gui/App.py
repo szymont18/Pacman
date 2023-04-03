@@ -20,8 +20,6 @@ class App:
         # Okno
         self.window = pygame.display.set_mode((self.MAX_COL * self.FIELD_SIZE, self.MAX_ROW * self.FIELD_SIZE))
 
-
-
         # LISTENER
         self.__KEYH = KeyHandler()
 
@@ -60,13 +58,20 @@ class App:
 
     def draw_items(self, map: GameMap):
         items: dict() = map.get_items()
+        keys_to_removed = []
 
         for key in items.keys():
             # print(key.ROW,key.COL)
             item = items.get(key)
-            image = self.__TEXTURE_FACTORY.load(item.get_image_path())
-            image_adjusted = pygame.transform.scale(image, (self.FIELD_SIZE, self.FIELD_SIZE))
-            self.window.blit(image_adjusted, (item.POS_X, item.POS_Y))
+            if item.is_active:
+                image = self.__TEXTURE_FACTORY.load(item.get_image_path())
+                image_adjusted = pygame.transform.scale(image, (self.FIELD_SIZE, self.FIELD_SIZE))
+                self.window.blit(image_adjusted, (item.POS_X, item.POS_Y))
+            else:
+                keys_to_removed.append(key)
+
+        for key in keys_to_removed:
+            items.pop(key)
 
     def launch_game(self):
         game_map = Level01(self.MAX_ROW, self.MAX_COL, self.FIELD_SIZE)
