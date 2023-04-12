@@ -9,3 +9,6 @@ class BonusLife(Item):
 
     def get_image_path(self):
         return "resources/items/BonusLife"+str(self.sprite_nr)+".png"
+
+    def __str__(self):
+        print(f"BL: {self.POS_Y/48} {self.POS_X/48} ")

@@ -2,17 +2,18 @@ from MapElements.MapElement import MapElement
 from Enums import Direction as Direction
 from Enums.Direction import *
 import pygame
+import time
 
 class Pacman(MapElement):
-    def __init__(self,POS_X,POS_Y,FIELD_SIZE,KEY_HANDLER,C_CHECKER,MAP,ENGINE):
-        super().__init__(POS_X, POS_Y, FIELD_SIZE, C_CHECKER, MAP)
+    def __init__(self,POS_X,POS_Y,FIELD_SIZE,KEY_HANDLER,C_CHECKER,MAP,ENGINE,SPRITE_CHG_TIME):
+        super().__init__(POS_X, POS_Y, FIELD_SIZE, C_CHECKER, MAP,SPRITE_CHG_TIME,ENGINE)
         self.__KEY_HANDLER = KEY_HANDLER
-        self.__ENGINE = ENGINE
+        self.__won = False #czy pacman wygral juz gre
+
 
         #Gdy uzytkownik wcisnal klawisz, ale pacman nie moze aktualnie wykonac skretu to tu jest przechowywana
         #informacje gdzie skrecic gdy nadazy sie taka mozliwosc
         self.__next_turn = None #Docelowo przechowuje Direction
-
 
     #Override
     def __str__(self):
@@ -20,6 +21,15 @@ class Pacman(MapElement):
 
     #Override
     def get_image_path(self):
+        if self._is_newborn:
+            return f"resources/pacman/P_SPAWN_{self._cur_sprite_nr}.png"
+
+        if self.__won:
+            return f"resources/pacman/P_WIN_{self._cur_sprite_nr}.png"
+
+        if self._is_killed:
+            return f"resources/pacman/P_DIE_{self._cur_sprite_nr}.png"
+
         if (self._direction == Direction.UP):
             return "resources/pacman/P_up_1.png"
         elif self._direction == Direction.DOWN:
@@ -57,17 +67,13 @@ class Pacman(MapElement):
 
         #Tutaj nastepuje ruszenie pacmana
         if self._direction == Direction.UP:
-            self.POS_Y -= self._speed
-            self.POS_Y = self.POS_Y % (self._MAP.MAX_COL * self._MAP.FIELD_SIZE)
+            self.set_pos_y( (self.POS_Y - self._speed)% (self._MAP.MAX_COL * self._MAP.FIELD_SIZE))
         elif self._direction == Direction.DOWN:
-            self.POS_Y += self._speed
-            self.POS_Y = self.POS_Y % (self._MAP.MAX_COL * self._MAP.FIELD_SIZE)
+            self.set_pos_y( (self.POS_Y + self._speed)% (self._MAP.MAX_COL * self._MAP.FIELD_SIZE))
         elif self._direction == Direction.LEFT:
-            self.POS_X -= self._speed
-            self.POS_X = self.POS_X % (self._MAP.MAX_ROW * self._MAP.FIELD_SIZE)
+            self.set_pos_x( (self.POS_X - self._speed)% (self._MAP.MAX_COL * self._MAP.FIELD_SIZE))
         else:
-            self.POS_X += self._speed
-            self.POS_X = self.POS_X % (self._MAP.MAX_ROW * self._MAP.FIELD_SIZE)
+            self.set_pos_x( (self.POS_X + self._speed)% (self._MAP.MAX_COL * self._MAP.FIELD_SIZE))
 
 
         #Po ruchu sprawdzamy czy weszlismy na item
@@ -76,8 +82,22 @@ class Pacman(MapElement):
         if item != None and item.is_active:
             print("Picked up")
             self._MAP.remove_item(item) # usuwamy item z mapy aby sie nie wyswietlal
-            self.__ENGINE.picked_up(item) # informujemy silnik zeby uruchomil bonusy podniesionego przedmiotu
+            self._ENGINE.picked_up(item) # informujemy silnik zeby uruchomil bonusy podniesionego przedmiotu
 
+    def win(self):
+        self.__won = True
+        self._speed = 0
+        self._cur_sprite_nr = 1
+        self._last_sprite_chg = time.time()
+
+    def update(self):
+        if self.__won:
+            time_now = time.time()
+            if time_now - self._last_sprite_chg > self.SPRITE_CHG_TIME and self._cur_sprite_nr < 4:
+                self._cur_sprite_nr += 1
+                self._last_sprite_chg = time_now
+        else:
+            super().update()
 
 
 

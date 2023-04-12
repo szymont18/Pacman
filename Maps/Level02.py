@@ -9,18 +9,18 @@ from Maps.Tile import *
 from Enums.MonsterTypes import *
 
 
-class Level01(GameMap):
+class Level02(GameMap):
     def __init__(self,max_row,max_col,field_size):
-        super().__init__(max_row,max_col,field_size,field_size*2,field_size*10,[MonsterTypes.SKULL],[(8,8)],[(MonsterTypes.SKULL,(8,8))])
+        super().__init__(max_row,max_col,field_size,field_size*2,field_size*10,[MonsterTypes.SKULL],[(1,1)],[(MonsterTypes.SKULL,(1,1)),(MonsterTypes.DEMON,(1,15))])
         self.load_map(self.get_tiles_path())
         self.load_items()
 
 
     def get_image_path(self):
-        return "resources/maps/Level01.png"
+        return "resources/maps/Level02.png"
 
     def get_tiles_path(self): #sciezka gdzie jest plik tekstowy opisujacy wyglad mapy
-        return "resources/maps/Level01.txt"
+        return "resources/maps/Level02.txt"
 
     #Metoda laduje itemy (Dots i Redballs)
     def load_items(self):
@@ -40,12 +40,10 @@ class Level01(GameMap):
         self.bonus_probability[BonusLife] = (0.5, (3 * self.FIELD_SIZE, 13 * self.FIELD_SIZE))
         self.bonus_probability[BonusMoney] = (0.5, (13 * self.FIELD_SIZE, 3 * self.FIELD_SIZE))
 
-        redDotPositions = [(1, 1),
-                           (10, 1),
+        redDotPositions = [(10, 1),
                            (15, 1),
                            (1, 15),
-                           (10, 15),
-                           (15, 15)]
+                           (10, 15)]
 
         super().set_total_dots(len(self._items.keys()) - len(redDotPositions) -1 ) #ilosc bialych kropek to liczba wolnych pol - liczba czerwonych kropek
 

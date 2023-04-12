@@ -5,6 +5,7 @@ from Utility.Engine import *
 from MapElements.MapElement import *
 from Maps.GameMap import *
 from Maps.Level01 import *
+from Maps.Level02 import *
 from Enums.TileType import *
 
 class App:
@@ -79,7 +80,7 @@ class App:
 
     def draw_pacman_status(self, lives_number: int, score_number: int):
         start_hearth_position = (10, self.MAX_ROW * self.FIELD_SIZE) # 10 to offset ( powinno być sparametryzowane?)
-        print("Draw pacman status", lives_number, score_number)
+        #print("Draw pacman status", lives_number, score_number)
         for i in range(min(lives_number, 5)): # Maksymalnie 5 życ pokazanych
             self.window.blit(self.__TEXTURE_FACTORY.load("resources/items/BonusLife1.png"), start_hearth_position)
             start_hearth_position = (start_hearth_position[0] + self.FIELD_SIZE, start_hearth_position[1])
@@ -93,7 +94,7 @@ class App:
 
 
     def launch_game(self):
-        game_map = Level01(self.MAX_ROW, self.MAX_COL, self.FIELD_SIZE)
+        game_map = Level02(self.MAX_ROW, self.MAX_COL, self.FIELD_SIZE)
         engine = Engine(game_map, self.MAX_ROW, self.MAX_COL, self, self.__KEYH, self.FIELD_SIZE)
 
         engine.run()

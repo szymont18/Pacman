@@ -9,3 +9,6 @@ class RedBall(Item):
 
     def get_image_path(self):
         return "resources/items/RedBall"+str(self.sprite_nr)+".png"
+
+    def __str__(self):
+        print(f"RB: {self.POS_Y/48} {self.POS_X/48} ")

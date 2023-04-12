@@ -9,3 +9,6 @@ class BonusMoney(Item):
 
     def get_image_path(self):
         return "resources/items/BonusMoney"+str(self.sprite_nr)+".png"
+
+    def __str__(self):
+        print(f"BM: {self.POS_Y/48} {self.POS_X/48} ")

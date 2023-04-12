@@ -1,3 +1,5 @@
+import pygame
+
 from MapElements import MapElement
 from Enums import Direction as Direction
 from Enums.Direction import *
@@ -147,5 +149,16 @@ class CollisionChecker:
                 return item2
 
         return None
+
+    #Metoda do uzytku przez duszki - sprawdza czy duszek nachodzi na pacmana
+    def crosses_with_pacman(self,element):
+        pacman_pos_x,pacman_pos_y = self.__ENGINE.get_pacman_pos()
+
+        rect1 = pygame.Rect(element.get_pos_x(), element.get_pos_y(), self.__ENGINE.FIELD_SIZE-10, self.__ENGINE.FIELD_SIZE-10)
+        rect2 = pygame.Rect(pacman_pos_x, pacman_pos_y,self.__ENGINE.FIELD_SIZE-10, self.__ENGINE.FIELD_SIZE-10)
+
+        return rect1.colliderect(rect2)
+
+
 
 

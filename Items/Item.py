@@ -18,3 +18,7 @@ class Item:
 
     def set_activity(self, new):
         self.is_active = new
+
+    @abstractmethod
+    def __str__(self):
+        pass
