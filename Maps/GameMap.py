@@ -79,7 +79,7 @@ class GameMap(ABC):
                     self.TILES[row][col].add_possible_turn(Direction.DOWN)
                 if col -1 >= 0 and self.TILES[row][col-1].COLLISION == False:
                     self.TILES[row][col].add_possible_turn(Direction.LEFT)
-                if col < self.MAX_COL -1 and self.TILES[row][col+1].COLLISION == False:
+                if col < self.MAX_COL - 1 and self.TILES[row][col+1].COLLISION == False:
                     self.TILES[row][col].add_possible_turn(Direction.RIGHT)
 
 

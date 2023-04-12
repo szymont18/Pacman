@@ -177,6 +177,7 @@ class Engine(object):
                 if time_keeper - last_monster_spawn_time > self.MONSTER_APEAR_TIME and self.__monsters_alive < self.MAX_MONSTERS_ALIVE:
                     last_monster_spawn_time = time.time()
                     self.spawn_monster()
+
             else: #Metody z tego bloku maja sie wywolac jedynie gdy jedna ze stron wygrala
 
                 if self.__KEYH.space_pressed: self.__keep_running = False
