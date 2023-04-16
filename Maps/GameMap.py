@@ -1,3 +1,4 @@
+import random
 from abc import ABC, abstractmethod
 from Maps import Tile
 from Maps.Tile import *
@@ -21,6 +22,7 @@ class GameMap(ABC):
 
         self._items = dict()
         self.bonus_probability = dict()
+        self.__void_places = {}
 
         self.MONSTER_SPAWN_TILES = MONSTER_SPAWN_TILES #pola na ktorych moga sie zrespic przeciwnicy
         self.POSSIBLE_MONSTERS = POSSIBLE_MONSTERS
@@ -66,7 +68,6 @@ class GameMap(ABC):
                 row += 1
                 col = 0
         file.close()
-
         #TE PETLE PONIZEJ NADAJA SIE DO SMIECI
         for i in range(self.MAX_ROW):
             row = i
@@ -106,9 +107,12 @@ class GameMap(ABC):
         if item_coord in self._items:
             self._items.pop(item_coord)
 
+        self.__void_places[(item.POS_Y, item.POS_X)] = True
+
     def add_item(self, item: Item):
         item_coord = (item.POS_Y / self.FIELD_SIZE, item.POS_X / self.FIELD_SIZE)
         self._items[item_coord] = item
+        self.__void_places.pop((item.POS_Y, item.POS_X))
 
     def get_possible_turns_on(self,row,col):
         if row<0 or row == self.MAX_ROW or col<0 or col == self.MAX_COL:
@@ -119,6 +123,9 @@ class GameMap(ABC):
 
     def get_onload_monsters(self):
         return self.ONLOAD_SPAWN_MONSTERS
+
+    def get_random_spawn_place(self):
+        return random.choice(list(self.__void_places.keys()))
 
 
 

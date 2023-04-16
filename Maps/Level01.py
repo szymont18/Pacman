@@ -37,8 +37,8 @@ class Level01(GameMap):
         # self._items[(14, 3)] = BonusLife(3 * self.FIELD_SIZE, 14 * self.FIELD_SIZE, 0.5)
         # self._items[(2, 13)] = BonusMoney(13 * self.FIELD_SIZE, 2 * self.FIELD_SIZE, 0.5)
 
-        self.bonus_probability[BonusLife] = (0.5, (3 * self.FIELD_SIZE, 13 * self.FIELD_SIZE))
-        self.bonus_probability[BonusMoney] = (0.5, (13 * self.FIELD_SIZE, 3 * self.FIELD_SIZE))
+        self.bonus_probability[BonusLife] = (0.5, None) # None oznacza że miejsca spawnowania będą losowane
+        self.bonus_probability[BonusMoney] = (0.5, None) # None oznacza że miejsca spawnowania będą losowane
 
         redDotPositions = [(1, 1),
                            (10, 1),

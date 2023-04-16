@@ -1,3 +1,4 @@
+import random
 import time
 import pygame,sys
 from Items.BonusLife import BonusLife
@@ -26,11 +27,12 @@ class Engine(object):
         self.MONSTER_APEAR_TIME = 5 #Co 5 sekund  pojawia sie nowy potwor o ile limit potworow nie przekroczony
         self.GROW_TIME = 0.5  #Co 0.5 sekundy nowonarodzony map_element sie powieksza az staje sie dorosly po 5 zwiekszeniach (dot. pacmana i potworkow)
         self.DIE_TIME = 0.2 #Co 0.2 sekundy postepuje animacja umierania map_elementu
-        self.BONUS_APEAR_TIME = 10 # Co 10 sekund pojawia sie na mapie losowy bonus
+        self.BONUS_APEAR_TIME = 5 # Co 10 sekund pojawia sie na mapie losowy bonus
         self.BONUS_DISAPEAR_TIME = 10 # Po 10 sekundach jesli nie podniesiony - znika
         self.CAN_EAT_SKULLS_DURATION = 10 #Przez 10 sekund Pacmana moze zjadac czaszk (gdy podniesie czerwona kule)
-
-
+        self.BLINK_TIME = 5  # Przez 5 sekund Pacman nie może się skuć jeszcze raz
+        self.ITEM_BLINK_TIME = 0.2 # Co 0.2 sekund itemy robią blink
+        self.EAT_TIME_FACE = 0.1 # Co ile Pacman rusza buzia
 
         #Rozgrywka
         self.__lives = 3
@@ -69,7 +71,8 @@ class Engine(object):
     def spawn_pacman(self, KEYH):
         spawn_x = self.__MAP.get_pacman_spawn_x()
         spawn_y = self.__MAP.get_pacman_spawn_y()
-        self.__pacman = Pacman(spawn_x, spawn_y, self.FIELD_SIZE, KEYH, self.__C_CHECKER, self.__MAP, self,self.GROW_TIME,self.DIE_TIME)
+        self.__pacman = Pacman(spawn_x, spawn_y, self.FIELD_SIZE, KEYH, self.__C_CHECKER, self.__MAP, self,
+                               self.GROW_TIME,self.DIE_TIME, self.BLINK_TIME, self.EAT_TIME_FACE)
 
 
     def spawn_monster(self, init_monster_type=None, init_pos_x=None, init_pos_y=None):
@@ -176,9 +179,6 @@ class Engine(object):
             self.__tps_delta += self.__tps_clock.tick() / 1000.0
             time_keeper += self.__tps_clock.tick() / 1000.0
 
-
-
-
             #Metody w tym bloku maja sie wykonywac jedynie gdy zadna ze stron jeszcze nie wygrala
             if self.__game_on:
                 # SEKCJA PORUSZANIA ELEMENTOW MAPY
@@ -235,6 +235,9 @@ class Engine(object):
             else:
                 self.__monsters[monster_id].update()
 
+        for item in self.__MAP.get_items().values():
+            item.update()
+
         for monster_id in to_remove:
             self.__monsters.pop(monster_id)
 
@@ -246,20 +249,20 @@ class Engine(object):
         self.__APP.draw_map(self.__MAP)
         self.__APP.draw_items(self.__MAP)
 
-        self.__APP.draw_map_element(self.__pacman)
+        if self.__pacman.is_visible():
+            self.__APP.draw_map_element(self.__pacman)
+
         for monster_id in self.__monsters.keys():
             if self.__monsters[monster_id] != None:
                 self.__APP.draw_map_element(self.__monsters[monster_id])
 
         self.__APP.draw_pacman_status(self.__lives, self.__score)
 
-
-
     def picked_up(self, item: Item):
         if isinstance(item, Dot):
             self.__dots_eaten += 1
             print("zjedzono kropke")
-            #print(f"Ate {self.__dots_eaten} dots")
+            print(f"Ate {self.__dots_eaten} dots")
 
             #print()
             #for item in self.__MAP._items:
@@ -280,24 +283,41 @@ class Engine(object):
         # print("Dots_eaten = ", self.__dots_eaten)
         # print("Score = ", self.__score)
 
-    def random_choice(self, prob: int):
-        prob = 100 * prob
-        choice = randint(1, 101)
-        if choice <= prob:
-            return True
-        return False
+    def random_choice(self, chances, bonus):
+        return random.choices(bonus, weights=chances, k=1)[0]
 
     def spawn_bonus(self): #respi pieniazki, serduszki
-        for bonus_type, information in self.__MAP.bonus_probability.items():
-            probability, coordinates = information
-            if self.random_choice(probability):
-                new_bonus = bonus_type(coordinates[1], coordinates[0], probability)
+        chances = [information[0] * 100 for _, information in self.__MAP.bonus_probability.items()]
+        coordinates = [information[1] for _, information in self.__MAP.bonus_probability.items()]
+        bonus = [bonus_type for bonus_type, information in self.__MAP.bonus_probability.items()]
 
-                new_bonus.set_activity(True)
-                self.__MAP.add_item(new_bonus)
-                return
+        indexes = [i for i in range(len(chances))]
+        index = self.random_choice(chances, indexes)
 
-    #Metoda dziala troche jak notyfikacja obserwera po smierci moba - sluzy do sprzatniecia po nim
+        actual_coordinate = coordinates[index]
+        actual_bonus = bonus[index]
+        actual_probability = chances[index]
+
+        if actual_coordinate is None:
+            actual_coordinate = self.__MAP.get_random_spawn_place()
+        new_bonus = actual_bonus(actual_coordinate[1], actual_coordinate[0], actual_probability)
+        new_bonus.set_activity(True)
+        self.__MAP.add_item(new_bonus)
+        return
+
+        # Stary system
+        # for bonus_type, information in self.__MAP.bonus_probability.items():
+        #     probability, coordinates = information
+        #     if coordinates is None:
+        #         coordinates = self.__MAP.get_random_spawn_place()
+        #     if self.random_choice(probability):
+        #         new_bonus = bonus_type(coordinates[1], coordinates[0], probability)
+        #
+        #         new_bonus.set_activity(True)
+        #         self.__MAP.add_item(new_bonus)
+        #         return
+
+    # Metoda dziala troche jak notyfikacja obserwera po smierci moba - sluzy do sprzatniecia po nim
     def map_element_died(self,element : MapElement):
         if isinstance(element,Pacman): #Pacman zginal
             self.__lives = 0 #Narazie na zero zeby przetestowac giniecie pacmana
@@ -310,10 +330,15 @@ class Engine(object):
     def kill_map_element(self,element):
         element.kill()
 
-    #Metoda wolana przez duchy ktory wejda na pacmana, ale nie maja dostepu do wskaznika na pacmana wiec nie zawolaja bezposrednio metody kill()
+    # Metoda wolana przez duchy ktory wejda na pacmana, ale nie maja dostepu do wskaznika na pacmana wiec nie zawolaja bezposrednio metody kill()
     def kill_pacman(self):
-        #print("pacman zabijany")
-        self.kill_map_element(self.__pacman)
+        print("pacman zabijany, pacman_is_hurt", self.__pacman.is_hurt())
+        if not self.__pacman.is_hurt():
+            self.__pacman.set_hurt(True)
+            self.__lives -= 1
+
+        if self.__lives == 0:
+            self.kill_map_element(self.__pacman)
 
     def get_pacman_solid_area(self):
         #print("printuje")

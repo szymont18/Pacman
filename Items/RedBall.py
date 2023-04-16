@@ -12,3 +12,9 @@ class RedBall(Item):
 
     def __str__(self):
         print(f"RB: {self.POS_Y/48} {self.POS_X/48} ")
+
+    def update(self):
+        if pygame.time.get_ticks() - self._blink_timer > self.BLINK_TIME:
+            self.sprite_nr = (self.sprite_nr + 1) % 5
+            self.sprite_nr = self.sprite_nr if self.sprite_nr != 0 else 1
+            self._blink_timer = pygame.time.get_ticks()

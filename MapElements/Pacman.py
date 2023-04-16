@@ -5,7 +5,8 @@ import pygame
 import time
 
 class Pacman(MapElement):
-    def __init__(self,POS_X,POS_Y,FIELD_SIZE,KEY_HANDLER,C_CHECKER,MAP,ENGINE,SPRITE_CHG_TIME,SPRITE_ON_DEATH_CHG_TIME):
+    def __init__(self,POS_X,POS_Y,FIELD_SIZE,KEY_HANDLER,C_CHECKER,MAP,ENGINE,SPRITE_CHG_TIME,SPRITE_ON_DEATH_CHG_TIME,
+                 BLINK_TIME, EAT_TIME_FACE):
         super().__init__(POS_X, POS_Y, FIELD_SIZE, C_CHECKER, MAP,SPRITE_CHG_TIME,SPRITE_ON_DEATH_CHG_TIME,ENGINE)
         self.__KEY_HANDLER = KEY_HANDLER
         self.__won = False #czy pacman wygral juz gre
@@ -14,6 +15,17 @@ class Pacman(MapElement):
         #Gdy uzytkownik wcisnal klawisz, ale pacman nie moze aktualnie wykonac skretu to tu jest przechowywana
         #informacje gdzie skrecic gdy nadazy sie taka mozliwosc
         self.__next_turn = None #Docelowo przechowuje Direction
+
+        # Pola odpowiedzialne za tracenie serduszek
+        self.__hurt = False
+        self.__visible = True
+        self.__hurt_clock = -float('inf')
+        self.__last_blink = -float('inf')
+        self.__BLINK_TIME = BLINK_TIME
+
+        # Pola odpowiedzialne za ruszanie buzią
+        self.__EAT_TIME_FACE = EAT_TIME_FACE
+        self.__last_eat_change = -float('inf')
 
     #Override
     def __str__(self):
@@ -30,14 +42,17 @@ class Pacman(MapElement):
         if self._is_killed:
             return f"resources/pacman/P_DIE_{self._cur_sprite_nr}.png"
 
+        if self.__hurt and self._cur_sprite_nr == 2:
+            return f"resources/tiles/VOID.png"
+
         if (self._direction == Direction.UP):
-            return "resources/pacman/P_up_1.png"
+            return f'resources/pacman/P_up_{self._cur_sprite_nr}.png'
         elif self._direction == Direction.DOWN:
-            return "resources/pacman/P_down_1.png"
+            return f'resources/pacman/P_down_{self._cur_sprite_nr}.png'
         elif self._direction == Direction.LEFT:
-            return "resources/pacman/P_left_1.png"
+            return f'resources/pacman/P_left_{self._cur_sprite_nr}.png'
         elif self._direction == Direction.RIGHT:
-            return "resources/pacman/P_right_1.png"
+            return f'resources/pacman/P_right_{self._cur_sprite_nr}.png'
         else:
             raise Exception(self.get_direction() + " is not a valid direction")
 
@@ -98,8 +113,31 @@ class Pacman(MapElement):
                 self._last_sprite_chg = time_now
         else:
             super().update()
+        if not self._is_newborn:
+            if pygame.time.get_ticks() - self.__last_eat_change > self.__EAT_TIME_FACE * 1000:
+                self._cur_sprite_nr = (self._cur_sprite_nr + 1) % 5
+                self._cur_sprite_nr = self._cur_sprite_nr if self._cur_sprite_nr != 0 else 1
+                self.__last_eat_change = pygame.time.get_ticks()
 
 
+        if self.__hurt and not self._is_killed:
+            if pygame.time.get_ticks() - self.__last_blink > 200:
+                self.__visible = False if self.__visible else True
+                self.__last_blink = pygame.time.get_ticks()
 
+        # Po 5 sekundach Pacman znów staje się vulnerable
+        if pygame.time.get_ticks() - self.__hurt_clock > self.__BLINK_TIME * 1000:
+            self.__hurt = False
+            self.__visible = True
 
+    def is_hurt(self):
+        return self.__hurt
 
+    def set_hurt(self, flag):
+        self.__hurt = flag
+
+        if self.__hurt:
+            self.__hurt_clock = pygame.time.get_ticks()
+
+    def is_visible(self):
+        return self.__visible

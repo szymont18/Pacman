@@ -30,22 +30,21 @@ class Level02(GameMap):
                     para = (i, j)
                     self._items[para] = Dot(j*self.FIELD_SIZE, i*self.FIELD_SIZE)
 
-        print(len(self._items.keys()))
 
         #super(). = len(self._items.keys())
 
         # self._items[(14, 3)] = BonusLife(3 * self.FIELD_SIZE, 14 * self.FIELD_SIZE, 0.5)
         # self._items[(2, 13)] = BonusMoney(13 * self.FIELD_SIZE, 2 * self.FIELD_SIZE, 0.5)
 
-        self.bonus_probability[BonusLife] = (0.5, (3 * self.FIELD_SIZE, 13 * self.FIELD_SIZE))
-        self.bonus_probability[BonusMoney] = (0.5, (13 * self.FIELD_SIZE, 3 * self.FIELD_SIZE))
+        self.bonus_probability[BonusLife] = (0.5, None)
+        self.bonus_probability[BonusMoney] = (0.5, None)
 
         redDotPositions = [(10, 1),
                            (15, 1),
                            (1, 15),
                            (10, 15)]
 
-        super().set_total_dots(len(self._items.keys()) - len(redDotPositions) -1 ) #ilosc bialych kropek to liczba wolnych pol - liczba czerwonych kropek
+        super().set_total_dots(len(self._items.keys()) - len(redDotPositions)) #ilosc bialych kropek to liczba wolnych pol - liczba czerwonych kropek
 
         for para in redDotPositions:
             self._items.pop(para) #usuwamy kropke ktora tam byla

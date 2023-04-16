@@ -12,6 +12,10 @@ class Item:
         self.SOLID_AREA = SOLID_AREA
         self.is_active = is_active
 
+        # Timer
+        self._blink_timer = -float('inf')
+        self.BLINK_TIME = 200
+
     @abstractmethod
     def get_image_path(self): #abstract
         pass
@@ -21,4 +25,8 @@ class Item:
 
     @abstractmethod
     def __str__(self):
+        pass
+
+    @abstractmethod
+    def update(self):
         pass
