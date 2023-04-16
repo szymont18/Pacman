@@ -5,8 +5,8 @@ import pygame
 import time
 
 class Pacman(MapElement):
-    def __init__(self,POS_X,POS_Y,FIELD_SIZE,KEY_HANDLER,C_CHECKER,MAP,ENGINE,SPRITE_CHG_TIME):
-        super().__init__(POS_X, POS_Y, FIELD_SIZE, C_CHECKER, MAP,SPRITE_CHG_TIME,ENGINE)
+    def __init__(self,POS_X,POS_Y,FIELD_SIZE,KEY_HANDLER,C_CHECKER,MAP,ENGINE,SPRITE_CHG_TIME,SPRITE_ON_DEATH_CHG_TIME):
+        super().__init__(POS_X, POS_Y, FIELD_SIZE, C_CHECKER, MAP,SPRITE_CHG_TIME,SPRITE_ON_DEATH_CHG_TIME,ENGINE)
         self.__KEY_HANDLER = KEY_HANDLER
         self.__won = False #czy pacman wygral juz gre
 
@@ -80,7 +80,7 @@ class Pacman(MapElement):
         item = self._C_CHECKER.check_for_items(self)
 
         if item != None and item.is_active:
-            print("Picked up")
+           # print("Picked up")
             self._MAP.remove_item(item) # usuwamy item z mapy aby sie nie wyswietlal
             self._ENGINE.picked_up(item) # informujemy silnik zeby uruchomil bonusy podniesionego przedmiotu
 

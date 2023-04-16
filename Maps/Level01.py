@@ -47,7 +47,7 @@ class Level01(GameMap):
                            (10, 15),
                            (15, 15)]
 
-        super().set_total_dots(len(self._items.keys()) - len(redDotPositions) -1 ) #ilosc bialych kropek to liczba wolnych pol - liczba czerwonych kropek
+        super().set_total_dots(len(self._items.keys()) - len(redDotPositions) ) #ilosc bialych kropek to liczba wolnych pol - liczba czerwonych kropek
 
         for para in redDotPositions:
             self._items.pop(para) #usuwamy kropke ktora tam byla

@@ -94,8 +94,17 @@ class App:
 
 
     def launch_game(self):
-        game_map = Level02(self.MAX_ROW, self.MAX_COL, self.FIELD_SIZE)
-        engine = Engine(game_map, self.MAX_ROW, self.MAX_COL, self, self.__KEYH, self.FIELD_SIZE)
+        #game_map = Level01(self.MAX_ROW, self.MAX_COL, self.FIELD_SIZE)
+        #engine = Engine(game_map, self.MAX_ROW, self.MAX_COL, self, self.__KEYH, self.FIELD_SIZE)
 
-        engine.run()
+        for i in range(1,3):
+            if i==1:
+                game_map = Level01(self.MAX_ROW, self.MAX_COL, self.FIELD_SIZE)
+            elif i==2:
+                game_map = Level02(self.MAX_ROW, self.MAX_COL, self.FIELD_SIZE)
+            engine = Engine(game_map, self.MAX_ROW, self.MAX_COL, self, self.__KEYH, self.FIELD_SIZE)
+            response = engine.run()
+            print("Odpowiez gry to " + str(response))
+            if response !=10: break  #Jesli pacman wygra gre to zwracana jest wartosc 10
+
         # self.window.setScene(gameScene) #tu powinno nastapic ustawienie sceny gry zamiast menu

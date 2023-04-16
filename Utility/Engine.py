@@ -25,18 +25,27 @@ class Engine(object):
         self.MAX_MONSTERS_ALIVE = 4 # Gdy __enemies_alive == MAX_ENEMIES_ALIVE to potwory sie nie respia
         self.MONSTER_APEAR_TIME = 5 #Co 5 sekund  pojawia sie nowy potwor o ile limit potworow nie przekroczony
         self.GROW_TIME = 0.5  #Co 0.5 sekundy nowonarodzony map_element sie powieksza az staje sie dorosly po 5 zwiekszeniach (dot. pacmana i potworkow)
+        self.DIE_TIME = 0.2 #Co 0.2 sekundy postepuje animacja umierania map_elementu
         self.BONUS_APEAR_TIME = 10 # Co 10 sekund pojawia sie na mapie losowy bonus
-        self.BONUS_DISAPEAR_TIME = 1200 # Po 10 sekundach jesli nie podniesiony - znika
-        self.__tps_delta = 0.0
-        self.__tps_clock = pygame.time.Clock()
+        self.BONUS_DISAPEAR_TIME = 10 # Po 10 sekundach jesli nie podniesiony - znika
+        self.CAN_EAT_SKULLS_DURATION = 10 #Przez 10 sekund Pacmana moze zjadac czaszk (gdy podniesie czerwona kule)
+
+
 
         #Rozgrywka
         self.__lives = 3
         self.__score = 0
         self.__dots_eaten = 0
+        self.__can_eat_skulls = False
+        self.__can_eat_skulls_remaining_time = 0
+
+        # Flaga sluzy po to aby nie zmienic rozmiaru dicta z potworami gdy silnik po nim iteruje
+        # Silnik po iteracji po slowniku odblokuje mozliwosc usuwania ze slownika
+        #self.__can_remove_monster = False
 
         self.__keep_running = True # czy silnik ma dalej pracowac
         self.__game_on = True #Czy rozgrywka ciagle trwa czy moze jedna ze stron juz wygrala
+        self.__game_won = False  # Czy Pacman wygral gre
         self.__is_paused = False
         self.__pacman = None # uchwyt do pacmana
 
@@ -44,6 +53,8 @@ class Engine(object):
         self.next_monster_id = 0 #id nastepnego respionego potworka
         self.__monsters_alive = 0
 
+        self.__tps_delta = 0.0
+        self.__tps_clock = pygame.time.Clock()
         self.__APP = APP
         self.MAX_COL = MAX_COL
         self.MAX_ROW = MAX_ROW
@@ -58,7 +69,7 @@ class Engine(object):
     def spawn_pacman(self, KEYH):
         spawn_x = self.__MAP.get_pacman_spawn_x()
         spawn_y = self.__MAP.get_pacman_spawn_y()
-        self.__pacman = Pacman(spawn_x, spawn_y, self.FIELD_SIZE, KEYH, self.__C_CHECKER, self.__MAP, self,self.GROW_TIME)
+        self.__pacman = Pacman(spawn_x, spawn_y, self.FIELD_SIZE, KEYH, self.__C_CHECKER, self.__MAP, self,self.GROW_TIME,self.DIE_TIME)
 
 
     def spawn_monster(self, init_monster_type=None, init_pos_x=None, init_pos_y=None):
@@ -68,9 +79,9 @@ class Engine(object):
         if init_monster_type != None and init_pos_x != None and init_pos_y != None:
             #print("juz predefined")
             if init_monster_type == MonsterTypes.SKULL:
-                monster = Skull(init_pos_x, init_pos_y, self.FIELD_SIZE, self.__C_CHECKER, self.__MAP, self, self.next_monster_id,self.GROW_TIME)
+                monster = Skull(init_pos_x, init_pos_y, self.FIELD_SIZE, self.__C_CHECKER, self.__MAP, self, self.next_monster_id,self.GROW_TIME,self.DIE_TIME)
             elif init_monster_type == MonsterTypes.DEMON:
-                monster = Demon(init_pos_x, init_pos_y, self.FIELD_SIZE, self.__C_CHECKER, self.__MAP, self, self.next_monster_id,self.GROW_TIME)
+                monster = Demon(init_pos_x, init_pos_y, self.FIELD_SIZE, self.__C_CHECKER, self.__MAP, self, self.next_monster_id,self.GROW_TIME,self.DIE_TIME)
 
         else: #Potwor bedzie losowany
             monster_types = self.__MAP.POSSIBLE_MONSTERS
@@ -91,7 +102,7 @@ class Engine(object):
             pos_y = spawn_tile[1] * self.FIELD_SIZE
 
             if monster_type == MonsterTypes.SKULL:
-                monster = Skull(pos_x, pos_y, self.FIELD_SIZE, self.__C_CHECKER, self.__MAP, self, self.next_monster_id,self.GROW_TIME)
+                monster = Skull(pos_x, pos_y, self.FIELD_SIZE, self.__C_CHECKER, self.__MAP, self, self.next_monster_id,self.GROW_TIME,self.DIE_TIME)
 
         self.__monsters[self.next_monster_id] = monster
         #print(self.__MONSTERS[self.next_monster_id])
@@ -99,9 +110,11 @@ class Engine(object):
         self.__monsters_alive +=1
 
     def remove_monster(self,monster_id):
-        self.__monsters.pop(monster_id)
+        self.__monsters[monster_id] = None
+        #self.__monsters.pop(monster_id)
         self.__monsters_alive -=1
-        print("usunieto")
+        #self.__safe_to_remove_monster = False
+        #print("usunieto")
 
     def spawn_onload_monsters(self):
         #print("spawning onload monsters")
@@ -115,6 +128,7 @@ class Engine(object):
         #self.__pacman.set_speed(0)
         self.__pacman.win() #metoda sprawi ze pacman sie zatrzyma i odtworzy animacje radosci z wygranej
         self.__game_on = False
+        self.__game_won = True
 
 
         self.__monsters = dict()
@@ -122,6 +136,16 @@ class Engine(object):
 
         print("Wygrales")
         print("Nacisnij spacje aby przejsc do nastepnego poziomu")
+
+    def pacman_lost(self):
+        self.__game_on = False
+        self.__game_won = False
+
+        #self.__monsters = dict()
+        self.__monsters_alive = 0
+
+        print("Przegrales")
+        print("Nacisnij spacje aby kontynuowac")
 
     #Zgaszenie glownej petli silnika - koniec programu
     def shut_down(self):
@@ -152,14 +176,15 @@ class Engine(object):
             self.__tps_delta += self.__tps_clock.tick() / 1000.0
             time_keeper += self.__tps_clock.tick() / 1000.0
 
-            #SEKCJA PORUSZANIA ELEMENTOW MAPY
-            while self.__tps_delta > 1 / self.TPS:
-                self.update()
-                self.__tps_delta -= 1 / self.TPS
+
 
 
             #Metody w tym bloku maja sie wykonywac jedynie gdy zadna ze stron jeszcze nie wygrala
             if self.__game_on:
+                # SEKCJA PORUSZANIA ELEMENTOW MAPY
+                while self.__tps_delta > 1 / self.TPS:
+                    self.update()
+                    self.__tps_delta -= 1 / self.TPS
                 # METODA NA CZAS TESTOWANIA
                 #if self.__dots_eaten == 5:
                 #    self.pacman_won()
@@ -180,7 +205,9 @@ class Engine(object):
 
             else: #Metody z tego bloku maja sie wywolac jedynie gdy jedna ze stron wygrala
 
-                if self.__KEYH.space_pressed: self.__keep_running = False
+                if self.__KEYH.space_pressed:
+                    self.__keep_running = False
+
 
 
 
@@ -189,19 +216,29 @@ class Engine(object):
             pygame.display.flip()
 
         #W tym momencie gry sie skonczyla (wygralismy lub przegralismy)
-        if self.__dots_eaten == self.__MAP.get_total_dots() or self.__dots_eaten == 5:  # Pacman wygral
+        if self.__game_won:  # Pacman wygral
             return 10
-        elif self.__lives == 0: #Pacman zmarl
+        elif not self.__game_on: #Rozgrywka sie zakonczyla a pacman nie wygral -> pacman przegral
             return -10
 
-        return 0
+        return 0 #Uzytkownik opuscil nieukonczona rozgrywke
 
     def update(self):
         self.__pacman.update()
+        #self.__can_remove_monster = False
         #Ruszenie potworkow
+        to_remove = []
+
         for monster_id in self.__monsters.keys():
-            #print("potwor bedzie ruszany")
-            self.__monsters[monster_id].update()
+            if self.__monsters[monster_id] == None:
+                to_remove.append(monster_id)
+            else:
+                self.__monsters[monster_id].update()
+
+        for monster_id in to_remove:
+            self.__monsters.pop(monster_id)
+
+       # self.__can_remove_monster = True
 
 
     def draw(self):
@@ -211,7 +248,8 @@ class Engine(object):
 
         self.__APP.draw_map_element(self.__pacman)
         for monster_id in self.__monsters.keys():
-            self.__APP.draw_map_element(self.__monsters[monster_id])
+            if self.__monsters[monster_id] != None:
+                self.__APP.draw_map_element(self.__monsters[monster_id])
 
         self.__APP.draw_pacman_status(self.__lives, self.__score)
 
@@ -220,6 +258,7 @@ class Engine(object):
     def picked_up(self, item: Item):
         if isinstance(item, Dot):
             self.__dots_eaten += 1
+            print("zjedzono kropke")
             #print(f"Ate {self.__dots_eaten} dots")
 
             #print()
@@ -227,10 +266,14 @@ class Engine(object):
             #    print(item)
 
         elif isinstance(item, RedBall):
+            print("podniesiono redBall")
             self.__score += 100
+            self.make_skulls_vulnerable()
         elif isinstance(item, BonusLife):
+            print("podniesiono serduszko")
             self.__lives += 1
         elif isinstance(item, BonusMoney):
+            print("podniesiono kaske")
             self.__score += 10_000
 
         # print("Actual lifes = ", self.__lives)
@@ -258,7 +301,8 @@ class Engine(object):
     def map_element_died(self,element : MapElement):
         if isinstance(element,Pacman): #Pacman zginal
             self.__lives = 0 #Narazie na zero zeby przetestowac giniecie pacmana
-            self.__keep_running = False
+            self.pacman_lost()
+
         else: #Wiemy ze to potwor
             self.remove_monster(element.MONSTER_ID)
 
@@ -268,7 +312,7 @@ class Engine(object):
 
     #Metoda wolana przez duchy ktory wejda na pacmana, ale nie maja dostepu do wskaznika na pacmana wiec nie zawolaja bezposrednio metody kill()
     def kill_pacman(self):
-        print("pacman zabijany")
+        #print("pacman zabijany")
         self.kill_map_element(self.__pacman)
 
     def get_pacman_solid_area(self):
@@ -279,5 +323,17 @@ class Engine(object):
     def get_pacman_pos(self):
         return self.__pacman.get_pos_x(), self.__pacman.get_pos_y()
 
+    def make_skulls_vulnerable(self):
+        print(self.__monsters)
+        for monster_id in self.__monsters:
+            monster = self.__monsters[monster_id]
+            if isinstance(monster,Skull) and monster.get_is_alive() and not monster.get_is_newborn():
+                print("tak jest")
+
+                self.__monsters[monster_id].change_vulnerability(True)
+
+
+    def make_skulls_predators(self):
+        pass
 
 

@@ -8,8 +8,8 @@ import time
 import pygame
 
 class Demon(MapElement):
-    def __init__(self,POS_X,POS_Y,FIELD_SIZE,C_CHECKER,MAP,ENGINE,MONSTER_ID,GROW_TIME):
-        super().__init__(POS_X, POS_Y, FIELD_SIZE, C_CHECKER, MAP,GROW_TIME,ENGINE)
+    def __init__(self,POS_X,POS_Y,FIELD_SIZE,C_CHECKER,MAP,ENGINE,MONSTER_ID,GROW_TIME,DIE_TIME):
+        super().__init__(POS_X, POS_Y, FIELD_SIZE, C_CHECKER, MAP,GROW_TIME,DIE_TIME,ENGINE)
         self.MONSTER_ID = MONSTER_ID #Unikalne Id potwora ulatwiajace silnikowi wyciaganie ich z Dicta
 
 

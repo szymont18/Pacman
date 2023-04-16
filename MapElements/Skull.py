@@ -8,10 +8,10 @@ import time
 import pygame
 
 class Skull(MapElement):
-    def __init__(self,POS_X,POS_Y,FIELD_SIZE,C_CHECKER,MAP,ENGINE,MONSTER_ID,GROW_TIME):
-        super().__init__(POS_X, POS_Y, FIELD_SIZE, C_CHECKER, MAP,GROW_TIME,ENGINE)
+    def __init__(self,POS_X,POS_Y,FIELD_SIZE,C_CHECKER,MAP,ENGINE,MONSTER_ID,GROW_TIME,DIE_TIME):
+        super().__init__(POS_X, POS_Y, FIELD_SIZE, C_CHECKER, MAP,GROW_TIME,DIE_TIME,ENGINE)
         self.MONSTER_ID = MONSTER_ID #Unikalne Id potwora ulatwiajace silnikowi wyciaganie ich z Dicta
-
+        self.__is_vulnerable = False #Pacman nie moze zjesc czaszki (Parametr ulega zmianie wraz ze zjedzeniem czerwonej kuli przez pacmana)
 
         #W przyszlosci warto przerobic growstage na cur_sprite_nr jak beda teksturki gotowe
 
@@ -23,21 +23,12 @@ class Skull(MapElement):
     def get_image_path(self):
         if self._is_newborn:
             return f"resources/skull/S_EGG_{self._cur_sprite_nr}.png"
+        elif self._is_killed:
+            return f"resources/skull/S_DIE_{self._cur_sprite_nr}.png"
+        elif self.__is_vulnerable:
+            return f"resources/skull/V_{self._direction}_{self._cur_sprite_nr}.png"
 
-        if (self._direction == Direction.UP):
-            return "resources/skull/S_UP_1.png"
-        elif self._direction == Direction.DOWN:
-            return "resources/skull/S_DOWN_1.png"
-        elif self._direction == Direction.LEFT:
-            return "resources/skull/S_LEFT_1.png"
-        elif self._direction == Direction.RIGHT:
-            return "resources/skull/S_RIGHT_1.png"
-        else:
-            raise Exception(self.get_direction() + " is not a valid direction")
-
-
-
-
+        return f"resources/skull/S_{self._direction}_1.png"
 
     def move(self):
         #Jesli czaszka nie moze dalej isc prosto to losuje nowy kierunek ruchu
@@ -50,7 +41,6 @@ class Skull(MapElement):
                if self._C_CHECKER.can_move(self,direction):
                    self._direction = direction  # zmiana kierunku
                    break
-
 
         #Tutaj nastepuje ruszenie potworka (wiemy na tym etapie ze moze tam isc)
         if self._direction == Direction.UP:
@@ -68,4 +58,11 @@ class Skull(MapElement):
 
 
         if self._C_CHECKER.crosses_with_pacman(self):
-            self._ENGINE.kill_pacman()
+            if self.__is_vulnerable:
+                self.kill()
+            else:
+                self._ENGINE.kill_pacman()
+
+    def change_vulnerability(self,val : bool):
+        self.__is_vulnerable = val
+        self._cur_sprite_nr = 1

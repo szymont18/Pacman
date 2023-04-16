@@ -6,12 +6,12 @@ class Direction(Enum):
     LEFT = 3
     RIGHT = 4
 
-    def __to_string(self):
+    def __str__(self):
         if self == Direction.UP:
             return "UP"
-        elif self == Direction.DN:
-            return "DN"
+        elif self == Direction.DOWN:
+            return "DOWN"
         elif self == Direction.LEFT:
-            return "LT"
+            return "LEFT"
         else:
-            return "RT"
+            return "RIGHT"
