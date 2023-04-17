@@ -8,7 +8,8 @@ import pygame
 
 
 class GameMap(ABC):
-    def __init__(self, MAX_COL, MAX_ROW, FIELD_SIZE, PACMAN_SPAWN_X, PACMAN_SPAWN_Y,POSSIBLE_MONSTERS,MONSTER_SPAWN_TILES, ONLOAD_SPAWN_MONSTERS):
+    def __init__(self, MAX_COL, MAX_ROW, FIELD_SIZE, PACMAN_SPAWN_X, PACMAN_SPAWN_Y,
+                 POSSIBLE_MONSTERS, MONSTER_SPAWN_TILES, ONLOAD_SPAWN_MONSTERS):
         self.MAX_COL = MAX_COL
         self.MAX_ROW = MAX_ROW
 
@@ -127,7 +128,8 @@ class GameMap(ABC):
     def get_random_spawn_place(self):
         return random.choice(list(self.__void_places.keys()))
 
-
+    def clear_items(self):
+        self._items = dict()
 
 
 

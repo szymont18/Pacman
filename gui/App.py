@@ -1,4 +1,8 @@
+from time import sleep
+
 import pygame
+
+from gui.Menu.Components.TextArea import TextArea
 from gui.TextureFactory import *
 from Utility.KeyHandler import *
 from Utility.Engine import *
@@ -6,7 +10,9 @@ from MapElements.MapElement import *
 from Maps.GameMap import *
 from Maps.Level01 import *
 from Maps.Level02 import *
+from Maps.Level03 import *
 from Enums.TileType import *
+
 
 class App:
     def __init__(self):
@@ -68,15 +74,17 @@ class App:
         for key in items.keys():
             # print(key.ROW,key.COL)
             item = items.get(key)
-            if item.is_active:
-                image = self.__TEXTURE_FACTORY.load(item.get_image_path())
-                image_adjusted = pygame.transform.scale(image, (self.FIELD_SIZE, self.FIELD_SIZE))
-                self.window.blit(image_adjusted, (item.POS_X, item.POS_Y))
-            else:
-                keys_to_removed.append(key)
+            #if item.is_active:
+            image = self.__TEXTURE_FACTORY.load(item.get_image_path())
+            image_adjusted = pygame.transform.scale(image, (self.FIELD_SIZE, self.FIELD_SIZE))
+            self.window.blit(image_adjusted, (item.POS_X, item.POS_Y))
 
-        for key in keys_to_removed:
-            items.pop(key)
+            #Zmienilem ze nie App pamieta o sprzataniu tylko silnik w petli update() zeby bylo tak jak z potworkami
+            #else:
+            #    keys_to_removed.append(key)
+
+        #for key in keys_to_removed:
+        #    items.pop(key)
 
     def draw_pacman_status(self, lives_number: int, score_number: int):
         start_hearth_position = (10, self.MAX_ROW * self.FIELD_SIZE) # 10 to offset ( powinno być sparametryzowane?)
@@ -92,19 +100,75 @@ class App:
         score_img = self.font.render("SCORE: " + str(score_number), True, "white")
         self.window.blit(score_img, (self.MAX_COL * (self.FIELD_SIZE - 15), self.MAX_ROW * self.FIELD_SIZE))
 
+    def draw_win_level(self):
+        rectangle = pygame.rect.Rect((100, 200), (514, 400))
+        pygame.draw.rect(self.window, "black", rectangle, 0, 5)
+        statement = TextArea((200, 100), 514, 100, f'Congratulation !!!', self.window)
+        statement2 = TextArea((350, 250), 214, 50, f'Level passed!', self.window, font_size=45, rgb=(247, 245, 245))
+        statement3 = TextArea((450, 250), 214, 50, f'Press space to continue', self.window, font_size=45,
+                              rgb=(247, 245, 245))
+
+        statement.draw()
+        statement2.draw()
+        statement3.draw()
+
+    def draw_lose_level(self):
+        rectangle = pygame.rect.Rect((100, 200), (514, 400))
+        pygame.draw.rect(self.window, "black", rectangle, 0, 5)
+        statement = TextArea((200, 100), 514, 100, f'Defeat :(', self.window, rgb=(184, 6, 26))
+        statement2 = TextArea((350, 250), 214, 50, f'Level lost!', self.window, font_size=45, rgb=(247, 245, 245))
+        statement3 = TextArea((450, 250), 214, 50, f'Press space to continue', self.window, font_size=45,
+                              rgb=(247, 245, 245))
+
+        statement.draw()
+        statement2.draw()
+        statement3.draw()
+
+    def draw_game_win(self):
+        rectangle = pygame.rect.Rect((100, 200), (514, 400))
+        pygame.draw.rect(self.window, "black", rectangle, 0, 5)
+        statement = TextArea((200, 100), 514, 100, f'Congratulations!!!', self.window)
+        statement2 = TextArea((350, 250), 214, 50, f'You win the game!', self.window, font_size=45, rgb=(247, 245, 245))
+        statement3 = TextArea((450, 250), 214, 50, f'Press space to exit', self.window, font_size=45,
+                              rgb=(247, 245, 245))
+
+        statement.draw()
+        statement2.draw()
+        statement3.draw()
 
     def launch_game(self):
-        #game_map = Level01(self.MAX_ROW, self.MAX_COL, self.FIELD_SIZE)
-        #engine = Engine(game_map, self.MAX_ROW, self.MAX_COL, self, self.__KEYH, self.FIELD_SIZE)
-
-        for i in range(1,3):
+        pygame.init()
+        # #game_map = Level01(self.MAX_ROW, self.MAX_COL, self.FIELD_SIZE)
+        # #engine = Engine(game_map, self.MAX_ROW, self.MAX_COL, self, self.__KEYH, self.FIELD_SIZE)
+        #
+        for i in range(1, 4):
             if i==1:
                 game_map = Level01(self.MAX_ROW, self.MAX_COL, self.FIELD_SIZE)
             elif i==2:
                 game_map = Level02(self.MAX_ROW, self.MAX_COL, self.FIELD_SIZE)
+            elif i==3:
+                game_map = Level03(self.MAX_ROW, self.MAX_COL, self.FIELD_SIZE)
+
             engine = Engine(game_map, self.MAX_ROW, self.MAX_COL, self, self.__KEYH, self.FIELD_SIZE)
             response = engine.run()
             print("Odpowiez gry to " + str(response))
             if response !=10: break  #Jesli pacman wygra gre to zwracana jest wartosc 10
 
+        sleep(0.400)
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit(0)
+                elif event.type == pygame.KEYDOWN:
+                    self.__KEYH.key_pressed(event)
+                elif event.type == pygame.KEYUP:
+                    self.__KEYH.key_released(event)
+
+            if self.__KEYH.space_pressed:
+                exit(0)
+
+            self.clear_map()
+            self.draw_game_win()
+            pygame.display.flip()
         # self.window.setScene(gameScene) #tu powinno nastapic ustawienie sceny gry zamiast menu

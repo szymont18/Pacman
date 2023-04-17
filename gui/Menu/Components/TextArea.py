@@ -4,7 +4,7 @@ import pygame
 class TextArea:
     def __init__(self, pos: (int, int), width, height, txt: str, screen, fontname="comicsanms", font_size=80,
                  rgb=(196, 191, 37)):
-        self.pos = pos
+        self.pos = pos #pos[0] - y; pos[1] - x
         self.txt = txt
         self.screen = screen
         self.rectangle = pygame.rect.Rect((pos[1], pos[0]), (width, height))

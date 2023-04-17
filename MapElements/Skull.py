@@ -8,8 +8,8 @@ import time
 import pygame
 
 class Skull(MapElement):
-    def __init__(self,POS_X,POS_Y,FIELD_SIZE,C_CHECKER,MAP,ENGINE,MONSTER_ID,GROW_TIME,DIE_TIME):
-        super().__init__(POS_X, POS_Y, FIELD_SIZE, C_CHECKER, MAP,GROW_TIME,DIE_TIME,ENGINE)
+    def __init__(self,POS_X,POS_Y,FIELD_SIZE,C_CHECKER,MAP,ENGINE,MONSTER_ID,GROW_TIME,DIE_TIME,MAX_DIE_SPRITES,MAX_SPAWN_SPRITES):
+        super().__init__(POS_X, POS_Y, FIELD_SIZE, C_CHECKER, MAP,GROW_TIME,DIE_TIME,ENGINE,MAX_DIE_SPRITES,MAX_SPAWN_SPRITES)
         self.MONSTER_ID = MONSTER_ID #Unikalne Id potwora ulatwiajace silnikowi wyciaganie ich z Dicta
         self.__is_vulnerable = False #Pacman nie moze zjesc czaszki (Parametr ulega zmianie wraz ze zjedzeniem czerwonej kuli przez pacmana)
 
@@ -28,7 +28,7 @@ class Skull(MapElement):
         elif self.__is_vulnerable:
             return f"resources/skull/V_{self._direction}_{self._cur_sprite_nr}.png"
 
-        return f"resources/skull/S_{self._direction}_1.png"
+        return f"resources/skull/S_{self._direction}_{self._cur_sprite_nr}.png"
 
     def move(self):
         #Jesli czaszka nie moze dalej isc prosto to losuje nowy kierunek ruchu
@@ -61,7 +61,7 @@ class Skull(MapElement):
             if self.__is_vulnerable:
                 self.kill()
             else:
-                self._ENGINE.kill_pacman()
+                self._ENGINE.hurt_pacman()
 
     def change_vulnerability(self,val : bool):
         self.__is_vulnerable = val

@@ -8,7 +8,7 @@ import time
 
 #Nadrzedna klasa dla wszystkich mobow w grze (potworki + pacman)
 class MapElement(ABC):
-    def __init__(self,POS_X,POS_Y,FIELD_SIZE,C_CHECKER,MAP,SPRITE_CHG_TIME,SPRITE_ON_DEATH_CHG_TIME,ENGINE):
+    def __init__(self,POS_X,POS_Y,FIELD_SIZE,C_CHECKER,MAP,SPRITE_CHG_TIME,SPRITE_ON_DEATH_CHG_TIME,ENGINE,MAX_DIE_SPRITES,MAX_SPAWN_SPRITES):
         self.POS_X = POS_X
         self.POS_Y = POS_Y
         self.SOLID_AREA = pygame.Rect(5, 5, FIELD_SIZE - 10, FIELD_SIZE - 10)
@@ -20,6 +20,8 @@ class MapElement(ABC):
         self.FIELD_SIZE = FIELD_SIZE
         self.SPRITE_CHG_TIME = SPRITE_CHG_TIME
         self.SPRITE_ON_DEATH_CHG_TIME = SPRITE_ON_DEATH_CHG_TIME
+        self.MAX_DIE_SPRITES = MAX_DIE_SPRITES
+        self.MAX_SPAWN_SPRITES = MAX_SPAWN_SPRITES
         self._is_newborn = True
         self._is_killed = False #tj. potwor zjadl pacmana lub pacman potwora i leci animacja smierci
         self._last_sprite_chg = time.time()
@@ -58,6 +60,7 @@ class MapElement(ABC):
 
     def get_is_alive(self):
         return not self._is_killed
+
     def get_is_newborn(self):
         return self._is_newborn
 
@@ -65,24 +68,37 @@ class MapElement(ABC):
         #Jesli jest dojrzaly i zyje to sie porusza
         if(not self._is_newborn and not self._is_killed):
             self.move() #Wolana jest metoda .move w odpowiedniej klasie dziedziczacej
+
+            time_now = time.time()
+            if time_now - self._last_sprite_chg > self.SPRITE_CHG_TIME/3:
+                self._cur_sprite_nr = (self._cur_sprite_nr + 1) % 5
+                self._cur_sprite_nr = self._cur_sprite_nr if self._cur_sprite_nr != 0 else 1
+                self._last_sprite_chg = time_now
+
         elif self._is_newborn: #Jesli jest nowonarodzony to beda animacje rodzenia sie
             time_now = time.time()
             if time_now - self._last_sprite_chg> self.SPRITE_CHG_TIME:
                 self._cur_sprite_nr +=1
                 self._last_sprite_chg = time_now
-                if self._cur_sprite_nr == 6:
+                if self._cur_sprite_nr == self.MAX_SPAWN_SPRITES:
                     self._is_newborn = False
                     self._cur_sprite_nr = 1
                     self.set_speed(self.MAX_SPEED)
+
         elif self._is_killed:
             time_now = time.time()
             if time_now - self._last_sprite_chg > self.SPRITE_ON_DEATH_CHG_TIME:
-                self._cur_sprite_nr += 1
+                self._cur_sprite_nr = (self._cur_sprite_nr + 1) % 6
+                self._cur_sprite_nr = self._cur_sprite_nr if self._cur_sprite_nr != 0 else 1
                 self._last_sprite_chg = time_now
-                if self._cur_sprite_nr == 6:
+                if self._cur_sprite_nr == self.MAX_DIE_SPRITES:
                     self._ENGINE.map_element_died(self)
-        else:
-            raise Exception("niezdefiniowane zachowanie w MapElement/upate")
+
+        #else:
+        #    time_now = time.time()
+         #   self._cur_sprite_nr = (self._cur_sprite_nr + 1) % 5
+         #   self._cur_sprite_nr = self._cur_sprite_nr if self._cur_sprite_nr != 0 else 1
+         #   self.__last_sprite_change = time_now
 
 
     def kill(self): #metoda zabija Postac (potworka lub pacmana)

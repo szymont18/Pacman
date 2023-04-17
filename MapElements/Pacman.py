@@ -6,8 +6,8 @@ import time
 
 class Pacman(MapElement):
     def __init__(self,POS_X,POS_Y,FIELD_SIZE,KEY_HANDLER,C_CHECKER,MAP,ENGINE,SPRITE_CHG_TIME,SPRITE_ON_DEATH_CHG_TIME,
-                 BLINK_TIME, EAT_TIME_FACE):
-        super().__init__(POS_X, POS_Y, FIELD_SIZE, C_CHECKER, MAP,SPRITE_CHG_TIME,SPRITE_ON_DEATH_CHG_TIME,ENGINE)
+                 BLINK_TIME, EAT_TIME_FACE,MAX_DIE_SPRITES,MAX_SPAWN_SPRITES):
+        super().__init__(POS_X, POS_Y, FIELD_SIZE, C_CHECKER, MAP,SPRITE_CHG_TIME,SPRITE_ON_DEATH_CHG_TIME,ENGINE,MAX_DIE_SPRITES,MAX_SPAWN_SPRITES)
         self.__KEY_HANDLER = KEY_HANDLER
         self.__won = False #czy pacman wygral juz gre
 
@@ -82,21 +82,21 @@ class Pacman(MapElement):
 
         #Tutaj nastepuje ruszenie pacmana
         if self._direction == Direction.UP:
-            self.set_pos_y( (self.POS_Y - self._speed)% (self._MAP.MAX_COL * self._MAP.FIELD_SIZE))
+            self.set_pos_y( (self.POS_Y - self._speed) % (self._MAP.MAX_COL * self._MAP.FIELD_SIZE))
         elif self._direction == Direction.DOWN:
-            self.set_pos_y( (self.POS_Y + self._speed)% (self._MAP.MAX_COL * self._MAP.FIELD_SIZE))
+            self.set_pos_y( (self.POS_Y + self._speed) % (self._MAP.MAX_COL * self._MAP.FIELD_SIZE))
         elif self._direction == Direction.LEFT:
-            self.set_pos_x( (self.POS_X - self._speed)% (self._MAP.MAX_COL * self._MAP.FIELD_SIZE))
+            self.set_pos_x( (self.POS_X - self._speed) % (self._MAP.MAX_COL * self._MAP.FIELD_SIZE))
         else:
-            self.set_pos_x( (self.POS_X + self._speed)% (self._MAP.MAX_COL * self._MAP.FIELD_SIZE))
+            self.set_pos_x( (self.POS_X + self._speed) % (self._MAP.MAX_COL * self._MAP.FIELD_SIZE))
 
 
         #Po ruchu sprawdzamy czy weszlismy na item
         item = self._C_CHECKER.check_for_items(self)
 
-        if item != None and item.is_active:
+        if item != None and not item.get_is_eaten():
            # print("Picked up")
-            self._MAP.remove_item(item) # usuwamy item z mapy aby sie nie wyswietlal
+            #self._MAP.remove_item(item) # usuwamy item z mapy aby sie nie wyswietlal (Przeniesiono te funkcjonalnosc do silnika)
             self._ENGINE.picked_up(item) # informujemy silnik zeby uruchomil bonusy podniesionego przedmiotu
 
     def win(self):
@@ -113,15 +113,9 @@ class Pacman(MapElement):
                 self._last_sprite_chg = time_now
         else:
             super().update()
-        if not self._is_newborn:
-            if pygame.time.get_ticks() - self.__last_eat_change > self.__EAT_TIME_FACE * 1000:
-                self._cur_sprite_nr = (self._cur_sprite_nr + 1) % 5
-                self._cur_sprite_nr = self._cur_sprite_nr if self._cur_sprite_nr != 0 else 1
-                self.__last_eat_change = pygame.time.get_ticks()
 
-
-        if self.__hurt and not self._is_killed:
-            if pygame.time.get_ticks() - self.__last_blink > 200:
+        if self.__hurt and not self._is_killed and not self.__won:
+            if pygame.time.get_ticks() - self.__last_blink > 100:
                 self.__visible = False if self.__visible else True
                 self.__last_blink = pygame.time.get_ticks()
 
@@ -141,3 +135,6 @@ class Pacman(MapElement):
 
     def is_visible(self):
         return self.__visible
+
+    def set_visible(self, visible):
+        self.__visible = visible

@@ -3,9 +3,9 @@ import pygame
 
 
 class Dot(Item):
-    def __init__(self,POS_X,POS_Y):
+    def __init__(self,POS_X,POS_Y,MAP):
         SOLID_AREA = pygame.Rect(23,23,2,2)
-        Item.__init__(self,POS_X,POS_Y,1,SOLID_AREA)
+        Item.__init__(self,POS_X,POS_Y,1,SOLID_AREA,MAP,0)
 
     def get_image_path(self):
         return "resources/items/Dot.png"

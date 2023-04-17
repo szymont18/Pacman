@@ -8,8 +8,8 @@ import time
 import pygame
 
 class Demon(MapElement):
-    def __init__(self,POS_X,POS_Y,FIELD_SIZE,C_CHECKER,MAP,ENGINE,MONSTER_ID,GROW_TIME,DIE_TIME):
-        super().__init__(POS_X, POS_Y, FIELD_SIZE, C_CHECKER, MAP,GROW_TIME,DIE_TIME,ENGINE)
+    def __init__(self,POS_X,POS_Y,FIELD_SIZE,C_CHECKER,MAP,ENGINE,MONSTER_ID,GROW_TIME,DIE_TIME,MAX_DIE_SPRITES,MAX_SPAWN_SPRITES):
+        super().__init__(POS_X, POS_Y, FIELD_SIZE, C_CHECKER, MAP,GROW_TIME,DIE_TIME,ENGINE,MAX_DIE_SPRITES,MAX_SPAWN_SPRITES)
         self.MONSTER_ID = MONSTER_ID #Unikalne Id potwora ulatwiajace silnikowi wyciaganie ich z Dicta
 
 
@@ -24,20 +24,7 @@ class Demon(MapElement):
         if self._is_newborn:
             return f"resources/demon/D_EGG_{self._cur_sprite_nr}.png"
 
-        if (self._direction == Direction.UP):
-            return "resources/demon/D_UP_1.png"
-        elif self._direction == Direction.DOWN:
-            return "resources/demon/D_DOWN_1.png"
-        elif self._direction == Direction.LEFT:
-            return "resources/demon/D_LEFT_1.png"
-        elif self._direction == Direction.RIGHT:
-            return "resources/demon/D_RIGHT_1.png"
-        else:
-            raise Exception(self.get_direction() + " is not a valid direction")
-
-
-
-
+        return f"resources/demon/D_{self._direction}_{self._cur_sprite_nr}.png"
 
     def move(self):
         #Jesli czaszka nie moze dalej isc prosto to losuje nowy kierunek ruchu
@@ -68,4 +55,4 @@ class Demon(MapElement):
 
 
         if self._C_CHECKER.crosses_with_pacman(self):
-            self._ENGINE.kill_pacman()
+            self._ENGINE.hurt_pacman()

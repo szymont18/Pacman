@@ -28,7 +28,7 @@ class Level02(GameMap):
             for j in range(self.MAX_COL):
                 if self.TILES[i][j].TYPE == TileType.VOID:
                     para = (i, j)
-                    self._items[para] = Dot(j*self.FIELD_SIZE, i*self.FIELD_SIZE)
+                    self._items[para] = Dot(j*self.FIELD_SIZE, i*self.FIELD_SIZE,self)
 
 
         #super(). = len(self._items.keys())
@@ -48,6 +48,6 @@ class Level02(GameMap):
 
         for para in redDotPositions:
             self._items.pop(para) #usuwamy kropke ktora tam byla
-            self._items[para] = RedBall(para[1]*self.FIELD_SIZE, para[0]*self.FIELD_SIZE) #wkladamy na jej miejsce RedBall
+            self._items[para] = RedBall(para[1]*self.FIELD_SIZE, para[0]*self.FIELD_SIZE,self) #wkladamy na jej miejsce RedBall
 
 

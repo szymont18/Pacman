@@ -11,7 +11,9 @@ from Enums.MonsterTypes import *
 
 class Level01(GameMap):
     def __init__(self,max_row,max_col,field_size):
-        super().__init__(max_row,max_col,field_size,field_size*2,field_size*10,[MonsterTypes.SKULL],[(8,8)],[(MonsterTypes.SKULL,(8,8))])
+        super().__init__(max_row,max_col,field_size,field_size*2,field_size*10,
+                         [MonsterTypes.SKULL], [(8, 8)],
+                         [(MonsterTypes.SKULL, (8, 8))])
         self.load_map(self.get_tiles_path())
         self.load_items()
 
@@ -28,7 +30,7 @@ class Level01(GameMap):
             for j in range(self.MAX_COL):
                 if self.TILES[i][j].TYPE == TileType.VOID:
                     para = (i, j)
-                    self._items[para] = Dot(j*self.FIELD_SIZE, i*self.FIELD_SIZE)
+                    self._items[para] = Dot(j*self.FIELD_SIZE, i*self.FIELD_SIZE,self)
 
         print(len(self._items.keys()))
 
@@ -51,6 +53,6 @@ class Level01(GameMap):
 
         for para in redDotPositions:
             self._items.pop(para) #usuwamy kropke ktora tam byla
-            self._items[para] = RedBall(para[1]*self.FIELD_SIZE, para[0]*self.FIELD_SIZE) #wkladamy na jej miejsce RedBall
+            self._items[para] = RedBall(para[1]*self.FIELD_SIZE, para[0]*self.FIELD_SIZE,self) #wkladamy na jej miejsce RedBall
 
 
