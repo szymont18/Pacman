@@ -25,19 +25,21 @@ class GameMap(ABC):
         self.bonus_probability = dict()
         self.__void_places = {}
 
-        self.MONSTER_SPAWN_TILES = MONSTER_SPAWN_TILES #pola na ktorych moga sie zrespic przeciwnicy
+        self.MONSTER_SPAWN_TILES = MONSTER_SPAWN_TILES  # Tiles where monsters can spawn
         self.POSSIBLE_MONSTERS = POSSIBLE_MONSTERS
-        self.ONLOAD_SPAWN_MONSTERS = ONLOAD_SPAWN_MONSTERS #potwory ktore maja sie zrespic na starcie gry (nie sa losowane tylko narzucone z gory)
+        self.ONLOAD_SPAWN_MONSTERS = ONLOAD_SPAWN_MONSTERS  # Monsters that are spawn when game started
+        # ( they are not random)
 
-        self._total_dots = -1 #To niby jest stala ale nie da sie jej ustawic w czasie inicjalizacji wiec ostatecznie nie jest stala
+        self._total_dots = -1  # It's supposed to be a constant, but it can't be set during initialization,
+        # so it's not a constant in the end
 
-        # Do rysowania
+        # For drawing
         self._void_image = pygame.transform.scale(pygame.image.load("resources/tiles/void.png"),
                                                   (self.FIELD_SIZE, self.FIELD_SIZE)).convert()
         self._wall_image = pygame.transform.scale(pygame.image.load("resources/tiles/wall.png"),
                                                   (self.FIELD_SIZE, self.FIELD_SIZE)).convert()
 
-    def set_total_dots(self,total_dots):
+    def set_total_dots(self, total_dots):
         self._total_dots = total_dots
 
     def get_pacman_spawn_x(self):
@@ -53,8 +55,8 @@ class GameMap(ABC):
     def get_image_path(self):
         pass
 
-    #zaladowanie mapy z pliku (Metoda wykonuje sie tylko raz w trakcie inicjalizacji mapy)
-    def load_map(self,filePath : str):
+    # zaladowanie mapy z pliku (Metoda wykonuje sie tylko raz w trakcie inicjalizacji mapy)
+    def load_map(self, filePath: str):
         file = open(filePath, 'r')
         row = 0
         col = 0
@@ -65,29 +67,26 @@ class GameMap(ABC):
                 number_int = int(number)
                 self.TILES[row][col] = Tile(TileTypeParser.parse(number_int), pos_x, pos_y)
                 col += 1
-            if col > self.MAX_COL-1:
+            if col > self.MAX_COL - 1:
                 row += 1
                 col = 0
         file.close()
-        #TE PETLE PONIZEJ NADAJA SIE DO SMIECI
+        # Loops below are garbage
         for i in range(self.MAX_ROW):
             row = i
             for j in range(self.MAX_COL):
                 col = j
 
-                if row-1 >= 0 and  self.TILES[row-1][col].COLLISION == False:
+                if row - 1 >= 0 and self.TILES[row - 1][col].COLLISION == False:
                     self.TILES[row][col].add_possible_turn(Direction.UP)
-                if row < self.MAX_ROW -1 and self.TILES[row+1][col].COLLISION == False:
+                if row < self.MAX_ROW - 1 and self.TILES[row + 1][col].COLLISION == False:
                     self.TILES[row][col].add_possible_turn(Direction.DOWN)
-                if col -1 >= 0 and self.TILES[row][col-1].COLLISION == False:
+                if col - 1 >= 0 and self.TILES[row][col - 1].COLLISION == False:
                     self.TILES[row][col].add_possible_turn(Direction.LEFT)
-                if col < self.MAX_COL - 1 and self.TILES[row][col+1].COLLISION == False:
+                if col < self.MAX_COL - 1 and self.TILES[row][col + 1].COLLISION == False:
                     self.TILES[row][col].add_possible_turn(Direction.RIGHT)
 
-
-
-
-    #Klasy dziedziczace w tym miejscu ustawiaja przedmioty na mapie (kropki, bonusy itp)
+    # Classes inheriting from here place items on the map (dots, bonuses, etc.)
     @abstractmethod
     def load_items(self):
         pass
@@ -100,10 +99,10 @@ class GameMap(ABC):
     def get_items(self):
         return self._items
 
-    def remove_item(self,item : Item):
+    def remove_item(self, item: Item):
         # para = PairRowCol(item.POS_Y/self.FIELD_SIZE, item.POS_X/self.FIELD_SIZE)
 
-        item_coord = (item.POS_Y / self.FIELD_SIZE, item.POS_X/self.FIELD_SIZE)
+        item_coord = (item.POS_Y / self.FIELD_SIZE, item.POS_X / self.FIELD_SIZE)
 
         if item_coord in self._items:
             self._items.pop(item_coord)
@@ -115,8 +114,8 @@ class GameMap(ABC):
         self._items[item_coord] = item
         self.__void_places.pop((item.POS_Y, item.POS_X))
 
-    def get_possible_turns_on(self,row,col):
-        if row<0 or row == self.MAX_ROW or col<0 or col == self.MAX_COL:
+    def get_possible_turns_on(self, row, col):
+        if row < 0 or row == self.MAX_ROW or col < 0 or col == self.MAX_COL:
             print("GameMap/get_possible_turns : lokalizacja poza mapa")
             return []
 
@@ -131,6 +130,8 @@ class GameMap(ABC):
     def clear_items(self):
         self._items = dict()
 
+    def get_void_image(self):
+        return self._void_image
 
-
-
+    def get_wall_image(self):
+        return self._wall_image

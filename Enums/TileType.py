@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class TileType(Enum):
     WALL = 1
     VOID = 2
@@ -9,5 +10,3 @@ class TileType(Enum):
             return "WALL"
         else:
             return "VOID"
-
-        

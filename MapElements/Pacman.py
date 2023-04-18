@@ -4,34 +4,36 @@ from Enums.Direction import *
 import pygame
 import time
 
+
 class Pacman(MapElement):
-    def __init__(self,POS_X,POS_Y,FIELD_SIZE,KEY_HANDLER,C_CHECKER,MAP,ENGINE,SPRITE_CHG_TIME,SPRITE_ON_DEATH_CHG_TIME,
-                 BLINK_TIME, EAT_TIME_FACE,MAX_DIE_SPRITES,MAX_SPAWN_SPRITES):
-        super().__init__(POS_X, POS_Y, FIELD_SIZE, C_CHECKER, MAP,SPRITE_CHG_TIME,SPRITE_ON_DEATH_CHG_TIME,ENGINE,MAX_DIE_SPRITES,MAX_SPAWN_SPRITES)
+    def __init__(self, POS_X, POS_Y, FIELD_SIZE, KEY_HANDLER, C_CHECKER, MAP, ENGINE, SPRITE_CHG_TIME,
+                 SPRITE_ON_DEATH_CHG_TIME,
+                 BLINK_TIME, EAT_TIME_FACE, MAX_DIE_SPRITES, MAX_SPAWN_SPRITES):
+        super().__init__(POS_X, POS_Y, FIELD_SIZE, C_CHECKER, MAP, SPRITE_CHG_TIME, SPRITE_ON_DEATH_CHG_TIME, ENGINE,
+                         MAX_DIE_SPRITES, MAX_SPAWN_SPRITES)
         self.__KEY_HANDLER = KEY_HANDLER
-        self.__won = False #czy pacman wygral juz gre
+        self.__won = False  # Has Pacman won the game already
 
+        # If User push the button but Pacman can not move to specified directory
+        # this directory is stored in this variable
+        self.__next_turn = None  # Stores Direction variable
 
-        #Gdy uzytkownik wcisnal klawisz, ale pacman nie moze aktualnie wykonac skretu to tu jest przechowywana
-        #informacje gdzie skrecic gdy nadazy sie taka mozliwosc
-        self.__next_turn = None #Docelowo przechowuje Direction
-
-        # Pola odpowiedzialne za tracenie serduszek
+        # Variables responsible for loses hearth
         self.__hurt = False
         self.__visible = True
         self.__hurt_clock = -float('inf')
         self.__last_blink = -float('inf')
         self.__BLINK_TIME = BLINK_TIME
 
-        # Pola odpowiedzialne za ruszanie buzią
+        # Variables responsible for sprites changing
         self.__EAT_TIME_FACE = EAT_TIME_FACE
         self.__last_eat_change = -float('inf')
 
-    #Override
+    # Override
     def __str__(self):
-        return "P "+self._direction.__str__()
+        return "P " + self._direction.__str__()
 
-    #Override
+    # Override
     def get_image_path(self):
         if self._is_newborn:
             return f"resources/pacman/P_SPAWN_{self._cur_sprite_nr}.png"
@@ -45,7 +47,7 @@ class Pacman(MapElement):
         if self.__hurt and self._cur_sprite_nr == 2:
             return f"resources/tiles/VOID.png"
 
-        if (self._direction == Direction.UP):
+        if self._direction == Direction.UP:
             return f'resources/pacman/P_up_{self._cur_sprite_nr}.png'
         elif self._direction == Direction.DOWN:
             return f'resources/pacman/P_down_{self._cur_sprite_nr}.png'
@@ -57,7 +59,7 @@ class Pacman(MapElement):
             raise Exception(self.get_direction() + " is not a valid direction")
 
     def move(self):
-        #Jesli KEY_HANDLER ma w kolejce klikniecie to ustawiamy ze przy najblizszej okazji PacMan ma skrecic w dana strone
+        # If KEY_HANDLER has a click queued, we set PacMan to turn in that direction at the next opportunity
         if self.__KEY_HANDLER.up_pressed:
             self.__next_turn = Direction.UP
         elif self.__KEY_HANDLER.down_pressed:
@@ -67,37 +69,36 @@ class Pacman(MapElement):
         elif self.__KEY_HANDLER.right_pressed:
             self.__next_turn = Direction.RIGHT
 
-        # Jesli nie moze skrecic to idzie dalej w tym samym kierunku badz stoi
-        if not self._C_CHECKER.can_move(self,self.__next_turn):
+        # If it cannot turn, it continues in the same direction or stands still
+        if not self._C_CHECKER.can_move(self, self.__next_turn):
 
-            #jesli jednak nie moze isc dalej w tym samym kierunku to musi stac
-            if(not self._C_CHECKER.can_move(self,self._direction)):
-                self.set_speed(0) #zatrzymanie pacmana
+            # but if it cannot go on in the same direction, it must stop
+            if not self._C_CHECKER.can_move(self, self._direction):
+                self.set_speed(0)  # Pacman stopped
         else:
-            self._direction = self.__next_turn #pacman skreca
-            self.__next_turn = None #wykorzystal skret
+            self._direction = self.__next_turn  # Pacman turns
+            self.__next_turn = None  # Used the turn
 
-            if self._C_CHECKER.can_move(self, self._direction): #jesli pacman moze isc w nowym kierunku
-                self.set_speed(self.MAX_SPEED)  # wprawiamy pacmana w ruch
+            if self._C_CHECKER.can_move(self, self._direction):  # If Pacman can move to the new directory
+                self.set_speed(self.MAX_SPEED)  # Pacman start to move
 
-        #Tutaj nastepuje ruszenie pacmana
+        # Pacman moving
         if self._direction == Direction.UP:
-            self.set_pos_y( (self.POS_Y - self._speed) % (self._MAP.MAX_COL * self._MAP.FIELD_SIZE))
+            self.set_pos_y((self.POS_Y - self._speed) % (self._MAP.MAX_COL * self._MAP.FIELD_SIZE))
         elif self._direction == Direction.DOWN:
-            self.set_pos_y( (self.POS_Y + self._speed) % (self._MAP.MAX_COL * self._MAP.FIELD_SIZE))
+            self.set_pos_y((self.POS_Y + self._speed) % (self._MAP.MAX_COL * self._MAP.FIELD_SIZE))
         elif self._direction == Direction.LEFT:
-            self.set_pos_x( (self.POS_X - self._speed) % (self._MAP.MAX_COL * self._MAP.FIELD_SIZE))
+            self.set_pos_x((self.POS_X - self._speed) % (self._MAP.MAX_COL * self._MAP.FIELD_SIZE))
         else:
-            self.set_pos_x( (self.POS_X + self._speed) % (self._MAP.MAX_COL * self._MAP.FIELD_SIZE))
+            self.set_pos_x((self.POS_X + self._speed) % (self._MAP.MAX_COL * self._MAP.FIELD_SIZE))
 
-
-        #Po ruchu sprawdzamy czy weszlismy na item
+        # Check if we crossed the item
         item = self._C_CHECKER.check_for_items(self)
 
-        if item != None and not item.get_is_eaten():
-           # print("Picked up")
-            #self._MAP.remove_item(item) # usuwamy item z mapy aby sie nie wyswietlal (Przeniesiono te funkcjonalnosc do silnika)
-            self._ENGINE.picked_up(item) # informujemy silnik zeby uruchomil bonusy podniesionego przedmiotu
+        if item is not None and not item.get_is_eaten():
+            # print("Picked up") self._MAP.remove_item(item) # we remove the item from the map so that it will not be
+            # displayed (Moved this functionality to the engine)
+            self._ENGINE.picked_up(item)  # Inform engine to take on bonus
 
     def win(self):
         self.__won = True

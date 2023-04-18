@@ -6,26 +6,27 @@ import pygame
 import time
 
 
-#Nadrzedna klasa dla wszystkich mobow w grze (potworki + pacman)
+# Overriding class for all mobs in the game (monsters + pacman)
 class MapElement(ABC):
-    def __init__(self,POS_X,POS_Y,FIELD_SIZE,C_CHECKER,MAP,SPRITE_CHG_TIME,SPRITE_ON_DEATH_CHG_TIME,ENGINE,MAX_DIE_SPRITES,MAX_SPAWN_SPRITES):
+    def __init__(self, POS_X, POS_Y, FIELD_SIZE, C_CHECKER, MAP, SPRITE_CHG_TIME, SPRITE_ON_DEATH_CHG_TIME, ENGINE,
+                 MAX_DIE_SPRITES, MAX_SPAWN_SPRITES):
         self.POS_X = POS_X
         self.POS_Y = POS_Y
         self.SOLID_AREA = pygame.Rect(5, 5, FIELD_SIZE - 10, FIELD_SIZE - 10)
         self._C_CHECKER = C_CHECKER
         self._MAP = MAP
         self._direction = Direction.RIGHT
-        self.MAX_SPEED = 3 #maksymalna (domyslna) szybkosc
-        self._speed = 0 #aktualna szybkosc
+        self.MAX_SPEED = 3  # Max and casual speed
+        self._speed = 0  # Actual speed
         self.FIELD_SIZE = FIELD_SIZE
         self.SPRITE_CHG_TIME = SPRITE_CHG_TIME
         self.SPRITE_ON_DEATH_CHG_TIME = SPRITE_ON_DEATH_CHG_TIME
         self.MAX_DIE_SPRITES = MAX_DIE_SPRITES
         self.MAX_SPAWN_SPRITES = MAX_SPAWN_SPRITES
         self._is_newborn = True
-        self._is_killed = False #tj. potwor zjadl pacmana lub pacman potwora i leci animacja smierci
+        self._is_killed = False  # Somebody kills his enemy
         self._last_sprite_chg = time.time()
-        self._cur_sprite_nr = 1  # nr aktualnego sprite'a do wyswietlenia
+        self._cur_sprite_nr = 1  # Actual sprite to display
         self._ENGINE = ENGINE
 
     @abstractmethod
@@ -36,23 +37,27 @@ class MapElement(ABC):
     def __str__(self):
         pass
 
-    #PONIZSZE METODY PUBLICZNE
+    @abstractmethod
+    def move(self):
+        pass
+
+    # Public methods
     def get_pos_x(self):
         return self.POS_X
 
     def get_pos_y(self):
         return self.POS_Y
 
-    def set_pos_x(self,pos_x):
+    def set_pos_x(self, pos_x):
         self.POS_X = pos_x
 
-    def set_pos_y(self,pos_y):
+    def set_pos_y(self, pos_y):
         self.POS_Y = pos_y
 
     def get_direction(self):
         return self._direction
 
-    def set_speed(self,speed):
+    def set_speed(self, speed):
         self._speed = speed
 
     def get_speed(self):
@@ -65,20 +70,20 @@ class MapElement(ABC):
         return self._is_newborn
 
     def update(self):
-        #Jesli jest dojrzaly i zyje to sie porusza
-        if(not self._is_newborn and not self._is_killed):
-            self.move() #Wolana jest metoda .move w odpowiedniej klasie dziedziczacej
+        # If it is not new_born and is alived
+        if not self._is_newborn and not self._is_killed:
+            self.move()  # In every in the inheriting class, the move class is called
 
             time_now = time.time()
-            if time_now - self._last_sprite_chg > self.SPRITE_CHG_TIME/3:
+            if time_now - self._last_sprite_chg > self.SPRITE_CHG_TIME / 3:
                 self._cur_sprite_nr = (self._cur_sprite_nr + 1) % 5
                 self._cur_sprite_nr = self._cur_sprite_nr if self._cur_sprite_nr != 0 else 1
                 self._last_sprite_chg = time_now
 
-        elif self._is_newborn: #Jesli jest nowonarodzony to beda animacje rodzenia sie
+        elif self._is_newborn:  # If he is newborn, there will be birth animations
             time_now = time.time()
-            if time_now - self._last_sprite_chg> self.SPRITE_CHG_TIME:
-                self._cur_sprite_nr +=1
+            if time_now - self._last_sprite_chg > self.SPRITE_CHG_TIME:
+                self._cur_sprite_nr += 1
                 self._last_sprite_chg = time_now
                 if self._cur_sprite_nr == self.MAX_SPAWN_SPRITES:
                     self._is_newborn = False
@@ -94,15 +99,15 @@ class MapElement(ABC):
                 if self._cur_sprite_nr == self.MAX_DIE_SPRITES:
                     self._ENGINE.map_element_died(self)
 
-        #else:
+        # else:
         #    time_now = time.time()
-         #   self._cur_sprite_nr = (self._cur_sprite_nr + 1) % 5
-         #   self._cur_sprite_nr = self._cur_sprite_nr if self._cur_sprite_nr != 0 else 1
-         #   self.__last_sprite_change = time_now
+        #   self._cur_sprite_nr = (self._cur_sprite_nr + 1) % 5
+        #   self._cur_sprite_nr = self._cur_sprite_nr if self._cur_sprite_nr != 0 else 1
+        #   self.__last_sprite_change = time_now
 
-
-    def kill(self): #metoda zabija Postac (potworka lub pacmana)
-        if self._is_killed: return #jesli juz nie zyje to nie zabijaj go od nowa (ten if jest po to zeby nie resetowala sprite_nr jak ktos stanie na nim znowu)
+    def kill(self):  # kill map Element
+        if self._is_killed: return  # if he's already dead, don't kill him again (this if is so that it doesn't reset
+        # sprite_nr if someone steps on it again)
         self._is_killed = True
         self._speed = 0
         self._cur_sprite_nr = 1
