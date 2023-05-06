@@ -1,12 +1,15 @@
 import pygame
 
+from MapElements.Vector2d import Vector2d
+
 
 class Button:
-    def __init__(self, pos: (int, int),width, height, text: str, screen, action=None,  fontname="comicsanms",
+    REACTION_TIME = -float('inf')
+    def __init__(self, pos: Vector2d, width, height, text: str, screen, action=None,  fontname="comicsanms",
                  font_size=30, rgb=(247, 245, 245)):
         self.pos = pos
         self.text = text
-        self.button = pygame.rect.Rect((pos[1], pos[0]), (width, height))
+        self.button = pygame.rect.Rect(pos.get_coords(), (width, height))
 
         # Set action to each button
         self.action = action
@@ -24,7 +27,6 @@ class Button:
         self.actual_button_color = self.button_color
         self.on_click_button_rgb = (117, 110, 110)
 
-
     def draw(self):
         font = pygame.font.SysFont(self.fontname, self.font_size)
         text_surface = font.render(self.text, True, self.actual_font_rgb)
@@ -33,6 +35,7 @@ class Button:
         self.screen.blit(text_surface, text_rect)
 
     def is_clicked(self, event):
+
         if event is not None:
             if self.button.collidepoint(event.pos):
                 self.actual_font_rgb = self.on_click_font_rgb
@@ -42,7 +45,9 @@ class Button:
                 self.actual_font_rgb = self.font_rgb
 
         if pygame.mouse.get_pressed()[0] and self.button.collidepoint(pygame.mouse.get_pos()):
-            print()
+            if pygame.time.get_ticks() - Button.REACTION_TIME < 500: return
+
+            Button.REACTION_TIME = pygame.time.get_ticks()
             self.action()
 
     def change_cover_colors(self, new_text_color, new_rectangle_color):

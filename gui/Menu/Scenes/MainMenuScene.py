@@ -1,3 +1,4 @@
+from MapElements.Vector2d import Vector2d
 from ..Components.Scene import *
 from ..Components.Button import *
 from ..Components.TextArea import *
@@ -18,20 +19,20 @@ class MainMenuScene(Scene):
         # Texts
         self.title = None
 
-        start_button = Button((350, 250), 214, 50, "Start Game", screen,
+        start_button = Button(Vector2d(350, 250), 214, 50, "Start Game", screen,
                               lambda: Scene.change_menu_scene(SceneTypes.START))
-        create_level = Button((400, 250), 214, 50, "Create Level", screen,
+        create_level = Button(Vector2d(400, 250), 214, 50, "Create Level", screen,
                               lambda : Scene.change_menu_scene(SceneTypes.LEVEL_CREATOR))
-        leader_board = Button((450, 250), 214, 50, "Leader_board", screen,
+        leader_board = Button(Vector2d(450, 250), 214, 50, "Leader_board", screen,
                               lambda: Scene.change_menu_scene(SceneTypes.LEADER))
-        settings = Button((500, 250), 214, 50, "Settings", screen,
+        settings = Button(Vector2d(500, 250), 214, 50, "Settings", screen,
                           lambda: Scene.change_menu_scene(SceneTypes.SETTINGS))
-        instructions = Button((550, 250), 214, 50, "Instructions", screen,
+        instructions = Button(Vector2d(550, 250), 214, 50, "Instructions", screen,
                               lambda : Scene.change_menu_scene(SceneTypes.INSTRUCTIONS))
-        exit_button = Button((600, 250), 214, 50, "Exit", screen,
+        exit_button = Button(Vector2d(600, 250), 214, 50, "Exit", screen,
                              lambda : Scene.change_menu_scene(SceneTypes.EXIT))
 
-        title_text = TextArea((200, 200), 314, 100, "P a c m a n", screen)
+        title_text = TextArea(Vector2d(200, 200), 314, 100, "P a c m a n", screen)
 
         self.set_buttons(start_button, create_level, leader_board, settings, instructions, exit_button)
         self.set_texts(title_text)

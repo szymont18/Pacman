@@ -1,5 +1,6 @@
 from time import sleep
 
+from MapElements.Vector2d import Vector2d
 from gui.Menu.Components.TextArea import TextArea
 from gui.TextureFactory import *
 from Utility.Engine import *
@@ -100,9 +101,9 @@ class App:
     def draw_win_level(self):
         rectangle = pygame.rect.Rect((100, 200), (514, 400))
         pygame.draw.rect(self.window, "black", rectangle, 0, 5)
-        statement = TextArea((200, 100), 514, 100, f'Congratulation !!!', self.window)
-        statement2 = TextArea((350, 250), 214, 50, f'Level passed!', self.window, font_size=45, rgb=(247, 245, 245))
-        statement3 = TextArea((450, 250), 214, 50, f'Press space to continue', self.window, font_size=45,
+        statement = TextArea(Vector2d(200, 100), 514, 100, f'Congratulation !!!', self.window)
+        statement2 = TextArea(Vector2d(350, 250), 214, 50, f'Level passed!', self.window, font_size=45, rgb=(247, 245, 245))
+        statement3 = TextArea(Vector2d(450, 250), 214, 50, f'Press space to continue', self.window, font_size=45,
                               rgb=(247, 245, 245))
 
         statement.draw()
@@ -112,9 +113,9 @@ class App:
     def draw_lose_level(self):
         rectangle = pygame.rect.Rect((100, 200), (514, 400))
         pygame.draw.rect(self.window, "black", rectangle, 0, 5)
-        statement = TextArea((200, 100), 514, 100, f'Defeat :(', self.window, rgb=(184, 6, 26))
-        statement2 = TextArea((350, 250), 214, 50, f'Level lost!', self.window, font_size=45, rgb=(247, 245, 245))
-        statement3 = TextArea((450, 250), 214, 50, f'Press space to continue', self.window, font_size=45,
+        statement = TextArea(Vector2d(200, 100), 514, 100, f'Defeat :(', self.window, rgb=(184, 6, 26))
+        statement2 = TextArea(Vector2d(350, 250), 214, 50, f'Level lost!', self.window, font_size=45, rgb=(247, 245, 245))
+        statement3 = TextArea(Vector2d(450, 250), 214, 50, f'Press space to continue', self.window, font_size=45,
                               rgb=(247, 245, 245))
 
         statement.draw()
@@ -124,9 +125,9 @@ class App:
     def draw_game_win(self):
         rectangle = pygame.rect.Rect((100, 200), (514, 400))
         pygame.draw.rect(self.window, "black", rectangle, 0, 5)
-        statement = TextArea((200, 100), 514, 100, f'Congratulations!!!', self.window)
-        statement2 = TextArea((350, 250), 214, 50, f'You win the game!', self.window, font_size=45, rgb=(247, 245, 245))
-        statement3 = TextArea((450, 250), 214, 50, f'Press space to exit', self.window, font_size=45,
+        statement = TextArea(Vector2d(200, 100), 514, 100, f'Congratulations!!!', self.window)
+        statement2 = TextArea(Vector2d(350, 250), 214, 50, f'You win the game!', self.window, font_size=45, rgb=(247, 245, 245))
+        statement3 = TextArea(Vector2d(450, 250), 214, 50, f'Press space to exit', self.window, font_size=45,
                               rgb=(247, 245, 245))
 
         statement.draw()

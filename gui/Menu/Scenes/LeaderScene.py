@@ -2,21 +2,81 @@ import pygame
 from ..Components.Scene import *
 from ..Components.Button import *
 from ..Components.TextArea import *
+import pandas as pd
+
+# TODO: SORTING DOES NOT WORK
+class SORTED(Enum):
+    SCORE = 1
+    TIME = 2
 
 
 class LeaderScene(Scene):
     def __init__(self, screen):
         super().__init__(screen)
 
-        self.text = TextArea((200, 200), 400, 400, "TO DO", screen)
-        self.return_button = Button((600, 600), 100, 100, "Return", screen,
+        self.rectangle_window = pygame.rect.Rect((100, 200), (514, 500))
+        self.title = TextArea(Vector2d(200, 150), 414, 100, "Leader Board", self.screen, rgb=(247, 245, 245))
+
+        self.sort_by = SORTED.SCORE
+        self.sort_by_score_button = Button(Vector2d(285, 100), 214, 50, "Score", self.screen,
+                                           lambda: self.change_sort_way(SORTED.SCORE))
+
+        self.sort_by_time_button = Button(Vector2d(285, 400), 214, 50, "Time", self.screen,
+                                          lambda: self.change_sort_way(SORTED.TIME))
+
+        self.return_button = Button(Vector2d(600, 200), 314, 50, "Return", screen,
                                     lambda: Scene.change_menu_scene(SceneTypes.MAIN))
 
+        self.leader_board = pd.read_csv("resources/leader_board.csv", sep=",")
+
+        self.leader_board_time = self.leader_board.sort_values(by="Time", inplace=False)
+        self.leader_board_time.reset_index(drop=True)
+        self.leader_board_score = self.leader_board.sort_values(by="Score", ascending=False, inplace=False)
+        self.leader_board_score.reset_index(drop=True)
+
+        self.leader_board = self.leader_board_score
+        self.leader_board_pos = Vector2d(335, 132)
+
+        self.col_width = [150, 150, 150]
+
+        self.row_height = 26
+
+        self.font = pygame.font.SysFont("comicsanms", 15)
+
     def draw(self, mouse):
-        self.text.draw()
+
+        pygame.draw.rect(self.screen, 'black', self.rectangle_window)
+        self.title.draw()
+
         self.return_button.draw()
+        self.sort_by_score_button.draw()
+        self.sort_by_time_button.draw()
 
+        self.sort_by_time_button.is_clicked(mouse)
         self.return_button.is_clicked(mouse)
+        self.sort_by_score_button.is_clicked(mouse)
 
+        self.draw_leader_board()
 
+    def change_sort_way(self, new_way):
+        self.sort_by = new_way
 
+        if self.sort_by == SORTED.SCORE:
+            self.leader_board = self.leader_board_score
+
+        else:
+            self.leader_board = self.leader_board_time
+
+    def draw_leader_board(self):
+        x, y = self.leader_board_pos.get_coords()
+        cnt = 0
+        for i, row in self.leader_board.iterrows():
+            for j, item in enumerate(row):
+                cell_x = x + sum(self.col_width[:j])
+                cell_y = y + cnt * self.row_height
+                pygame.draw.rect(self.screen, (247, 245, 245), (cell_x, cell_y, self.col_width[j], self.row_height), 1)
+
+                text = self.font.render(str(item), True, (247, 245, 245))
+                text_rect = text.get_rect(center=(cell_x + self.col_width[j] // 2, cell_y + self.row_height // 2))
+                self.screen.blit(text, text_rect)
+            cnt += 1

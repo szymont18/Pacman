@@ -343,11 +343,11 @@ class Engine(object):
     # The method works a bit like notification of the observer after the death of a mob -
     # it is used to clean up after it
     def map_element_died(self, element: MapElement):
-        if isinstance(element, Pacman):  # Pacman zginal
-            self.__lives = 0  # It's going to zero (???)
+        if isinstance(element, Pacman):  # Pacman die
+            self.__lives = 0  # It's going to zero (???) TODO : Test if nessesary
             self.pacman_lost()
 
-        else:  # Wiemy ze to potwor
+        else:  # We know it is monster
             self.remove_monster(element.MONSTER_ID)
 
     # To remove (???)

@@ -10,10 +10,10 @@ class ExitScene(Scene):
 
         self.rectangle = pygame.rect.Rect((200, 300), (314, 200))
 
-        self.text = TextArea((300, 200), 314, 100, 'Do you want to exit?', self.screen, font_size=30,
+        self.text = TextArea(Vector2d(300, 200), 314, 100, 'Do you want to exit?', self.screen, font_size=30,
                              rgb=(247, 245, 245))
-        self.yes_button = Button((400, 250), 100, 75, 'Yes', self.screen, lambda: exit(0))
-        self.no_button = Button((400, 364), 100, 75, 'No', self.screen, lambda : Scene.change_menu_scene(SceneTypes.MAIN))
+        self.yes_button = Button(Vector2d(400, 250), 100, 75, 'Yes', self.screen, lambda: exit(0))
+        self.no_button = Button(Vector2d(400, 364), 100, 75, 'No', self.screen, lambda : Scene.change_menu_scene(SceneTypes.MAIN))
 
         self.yes_button.change_cover_colors((196, 191, 37), (204, 6, 6))
 
