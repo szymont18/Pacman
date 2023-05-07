@@ -54,3 +54,6 @@ class Button:
         self.on_click_button_rgb = new_rectangle_color
         self.on_click_font_rgb = new_text_color
 
+
+    def set_action(self, action):
+        self.action = action

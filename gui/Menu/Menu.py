@@ -9,6 +9,7 @@ from gui.Menu.Scenes.LeaderScene import LeaderScene
 from gui.Menu.Scenes.LevelCreatorScene import LevelCreatorScene
 from gui.Menu.Scenes.MainMenuScene import MainMenuScene
 from gui.Menu.Scenes.SettingsScene import SettingsScene
+from gui.Menu.Scenes.StartGameScene import StartGameScene
 
 
 class Menu:
@@ -22,8 +23,9 @@ class Menu:
         # Background
         self.background_image = pygame.transform.scale(pygame.image.load("resources/ORIGINAL/LEVELS/Level01.bmp"),
                                                        (self.width, self.height))
-        self.scenes = [MainMenuScene(self.screen), None, LevelCreatorScene(self.screen), InstructionScene(self.screen),
-                       LeaderScene(self.screen), SettingsScene(self.screen), ExitScene(self.screen)]
+        self.scenes = [MainMenuScene(self.screen), StartGameScene(self.screen), LevelCreatorScene(self.screen),
+                       InstructionScene(self.screen), LeaderScene(self.screen), SettingsScene(self.screen),
+                       ExitScene(self.screen)]
 
     def draw(self, mouse):
         pygame.draw.rect(self.screen, 'black', [0, 0, self.width, self.height])

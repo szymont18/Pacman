@@ -1,10 +1,12 @@
 import pygame
+
+from ..Components.Image import Image
 from ..Components.Scene import *
 from ..Components.Button import *
 from ..Components.TextArea import *
 import pandas as pd
 
-# TODO: SORTING DOES NOT WORK
+
 class SORTED(Enum):
     SCORE = 1
     TIME = 2
@@ -34,14 +36,25 @@ class LeaderScene(Scene):
         self.leader_board_score = self.leader_board.sort_values(by="Score", ascending=False, inplace=False)
         self.leader_board_score.reset_index(drop=True)
 
-        self.leader_board = self.leader_board_score
+        self.leader_board = self.leader_board_score.iloc[:10]
         self.leader_board_pos = Vector2d(335, 132)
 
         self.col_width = [150, 150, 150]
 
         self.row_height = 26
 
+        self.up_image = Image(Vector2d(335, 586), 24, 2 * self.row_height, self.screen, "resources/menu/up.png")
+        self.down_image = Image(Vector2d(543, 586), 24, 2 * self.row_height, self.screen, "resources/menu/down.png")
+
+        self.up_button = Button(Vector2d(335, 586), 24, 2 * self.row_height, "", screen,
+                                lambda: self.change_offset(self.offset - 1))
+
+        self.down_button = Button(Vector2d(543, 586), 24, 2 * self.row_height, "", screen,
+                                  lambda: self.change_offset(self.offset + 1))
+
         self.font = pygame.font.SysFont("comicsanms", 15)
+
+        self.offset = 0
 
     def draw(self, mouse):
 
@@ -51,7 +64,13 @@ class LeaderScene(Scene):
         self.return_button.draw()
         self.sort_by_score_button.draw()
         self.sort_by_time_button.draw()
+        self.down_button.draw()
+        self.up_button.draw()
+        self.up_image.draw()
+        self.down_image.draw()
 
+        self.up_button.is_clicked(mouse)
+        self.down_button.is_clicked(mouse)
         self.sort_by_time_button.is_clicked(mouse)
         self.return_button.is_clicked(mouse)
         self.sort_by_score_button.is_clicked(mouse)
@@ -62,10 +81,10 @@ class LeaderScene(Scene):
         self.sort_by = new_way
 
         if self.sort_by == SORTED.SCORE:
-            self.leader_board = self.leader_board_score
+            self.leader_board = self.leader_board_score[:10]
 
         else:
-            self.leader_board = self.leader_board_time
+            self.leader_board = self.leader_board_time[:10]
 
     def draw_leader_board(self):
         x, y = self.leader_board_pos.get_coords()
@@ -80,3 +99,12 @@ class LeaderScene(Scene):
                 text_rect = text.get_rect(center=(cell_x + self.col_width[j] // 2, cell_y + self.row_height // 2))
                 self.screen.blit(text, text_rect)
             cnt += 1
+
+    def change_offset(self, new_offset):
+        if new_offset < 0 or new_offset + 10 > len(self.leader_board_score): return
+
+        self.offset = new_offset
+        if self.sort_by == SORTED.SCORE:
+            self.leader_board = self.leader_board_score[self.offset: self.offset + 10]
+        else:
+            self.leader_board = self.leader_board_time[self.offset: self.offset + 10]
