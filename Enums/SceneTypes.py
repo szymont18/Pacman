@@ -9,6 +9,7 @@ class SceneTypes(Enum):
     LEADER = 4
     SETTINGS = 5
     EXIT = 6
+    GAME = 7
 
     @staticmethod
     def to_int(scene_type):

@@ -102,6 +102,7 @@ class StartGameScene(Scene):
     @staticmethod
     def launch_game(game_id):
         print(f'Start game {game_id}')
+        Scene.GAME_SPEC.set_start_level(game_id)
 
     def draw_maps(self, mouse):
         image_to_draw = []

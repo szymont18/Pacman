@@ -13,12 +13,14 @@ from numpy.random import randint
 from Enums.MonsterTypes import *
 from MapElements.Skull import *
 from MapElements.Demon import *
+from Utility.GameSpec import GameSpec
 from Utility.KeyHandler import *
 from MapElements.Pacman import *
+from gui.Menu.Scenes.LevelStatusScene import STATUS, LevelStatusScene
 
 
 class Engine(object):
-    def __init__(self, MAP, MAX_ROW, MAX_COL, APP, KEYH, FIELD_SIZE):
+    def __init__(self, MAP, MAX_ROW, MAX_COL, APP, KEYH, FIELD_SIZE, GAME_SPEC: GameSpec):
         # pygame.init() # Moved to App.py -> launch function
 
         # CONSTANTS
@@ -36,9 +38,11 @@ class Engine(object):
         self.ITEM_BLINK_TIME = 0.2  # Every 0.2 seconds items blink
         self.EAT_TIME_FACE = 0.1  # How much Pacman  mouth moves
 
+
         # GAME
-        self.__lives = 3
-        self.__score = 0
+        self.__GAME_SPEC = GAME_SPEC
+        self.__lives = GAME_SPEC.get_lives()
+        self.__score = GAME_SPEC.get_score()
         self.__dots_eaten = 0
         self.__can_eat_skulls = False
         self.__can_eat_skulls_remaining_time = -float('inf')
@@ -146,6 +150,7 @@ class Engine(object):
 
         print("Wygrales")
         print("Nacisnij spacje aby przejsc do nastepnego poziomu")
+        self.shut_down()
 
     def pacman_lost(self):
         self.__game_on = False
@@ -156,6 +161,7 @@ class Engine(object):
 
         print("Przegrales")
         print("Nacisnij spacje aby kontynuowac")
+        self.shut_down()
 
     #  Shut the main loop of the engine
     def shut_down(self):
@@ -173,6 +179,7 @@ class Engine(object):
 
         while self.__keep_running:
             # print(self.__MAP.get_total_dots())
+
             # SEKCJA EVENTOW
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -227,11 +234,15 @@ class Engine(object):
             self.draw()
             pygame.display.flip()
 
+        # Save specification
+        self.__GAME_SPEC.set_score(self.__score)
+        self.__GAME_SPEC.set_lives(self.__lives)
+
         # End game - win / lose
         if self.__game_won:  # Win
-            return 10
+            return STATUS.LVL_WIN
         elif not self.__game_on:  # Lose
-            return -10
+            return STATUS.LVL_LOSE
 
         return 0  # Other
 
@@ -279,11 +290,11 @@ class Engine(object):
 
         self.__APP.draw_pacman_status(self.__lives, self.__score)
 
-        if not self.__game_on and self.__game_won:
-            self.__APP.draw_win_level()
-
-        if not self.__game_on and not self.__game_won:
-            self.__APP.draw_lose_level()
+        # if not self.__game_on and self.__game_won:
+        #     self.__APP.draw_win_level()
+        #
+        # if not self.__game_on and not self.__game_won:
+        #     self.__APP.draw_lose_level()
 
     # We tell the engine to assign the bonuses associated with picking up the item and the item itself will inform
     # about picking it up (Item will play pick up animations)
