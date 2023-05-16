@@ -28,3 +28,7 @@ class GhostBonusScene(Scene):
         self.title.draw()
         self.content.draw()
         self.images[self.sprite_nr % len(self.images)].draw()
+
+        # Actualise sprites
+        self.sprite_blink()
+

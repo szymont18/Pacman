@@ -45,7 +45,7 @@ class TextInput:
             if self.active:
                 if event.key == pygame.K_SPACE:
                     file = open("resources/leader_board.csv", "a")
-                    text2save = f'{self.text},{Scene.GAME_SPEC.get_score()},{Scene.GAME_SPEC.get_str_time()}'
+                    text2save = f'{self.text},{Scene.GAME_SPEC.get_score()},{Scene.GAME_SPEC.get_str_time()}\n'
                     file.write(text2save)
                     file.close()
                     self.text = ''

@@ -58,13 +58,15 @@ class LevelStatusScene(Scene):
             self.lvl_defeat3.draw()
 
         else:
-            self.leader_board_actualise.is_clicked(mouse)
-            self.leader_board_actualise.update()
+            if Scene.GAME_SPEC.get_start_level() == 0:
+                self.leader_board_actualise.is_clicked(mouse)
+                self.leader_board_actualise.update()
+                self.game_win3.draw()
+                self.leader_board_actualise.draw()
 
             self.game_win1.draw()
             self.game_win2.draw()
-            self.game_win3.draw()
-            self.leader_board_actualise.draw()
+
 
     def change_game_status(self, new_status):
         self.status = new_status

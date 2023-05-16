@@ -21,9 +21,10 @@ class SettingsScene(Scene):
         self.brightness_scroll_bar = ScrollBar(Vector2d(440, 200), 314, 25, self.screen,
                                                SettingsScene.change_brightness)
 
-        self.game_speed_text = TextArea(Vector2d(465, 200), 314, 100, "Game speed", self.screen, rgb=(247, 245, 245),
+        self.game_speed_text = TextArea(Vector2d(465, 200), 314, 100, "Hardness", self.screen, rgb=(247, 245, 245),
                                         font_size=30)
-        self.game_speed_scroll_bar = ScrollBar(Vector2d(530, 200), 314, 25, self.screen, SettingsScene.change_tick_rate)
+        self.game_speed_scroll_bar = ScrollBar(Vector2d(530, 200), 314, 25, self.screen,
+                                               SettingsScene.change_hardness_rate)
 
         self.return_button = Button(Vector2d(600, 200), 314, 50, "Return", screen,
                                     lambda: Scene.change_menu_scene(SceneTypes.MAIN))
@@ -57,5 +58,5 @@ class SettingsScene(Scene):
         pygame.display.set_gamma(scroll_percentage)
 
     @staticmethod
-    def change_tick_rate(scroll_percentage):
-        pass
+    def change_hardness_rate(scroll_percentage):
+        Scene.GAME_SPEC.set_hardness_ratio(scroll_percentage)

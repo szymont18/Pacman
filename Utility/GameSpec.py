@@ -62,7 +62,13 @@ class GameSpec:
 
     def get_str_time(self):
         delta = datetime.timedelta(seconds=self.time)
-        return str(delta).split(".")[0]  # delete milisecond
+        str_time = str(delta).split(".")[0]  # delete milisecond
+
+        length_delta = 8 - len(str_time)
+        if length_delta > 0:
+            str_time = '0' * length_delta + str_time
+
+        return str_time
 
     def reset(self):
         self.start_level = None
@@ -78,4 +84,5 @@ class GameSpec:
 
     def increment_time(self, time): self.time += time
 
+    def get_start_level(self): return self.start_level
 

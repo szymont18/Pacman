@@ -9,19 +9,19 @@ from Maps.Tile import *
 from Enums.MonsterTypes import *
 
 
-class Level03(GameMap):
+class Level06(GameMap):
     def __init__(self,max_row,max_col,field_size):
-        super().__init__(max_row,max_col,field_size,field_size*8,field_size*15,
-                         [MonsterTypes.SKULL], [(8, 7)], [(MonsterTypes.SKULL,(8,8)),(MonsterTypes.DEMON,(1,8))])
+        super().__init__(max_row,max_col,field_size,field_size*1,field_size*15,
+                         [MonsterTypes.SKULL], [(1, 1)], [(MonsterTypes.SKULL,(1,1)),(MonsterTypes.GHOST,(1,15)),(MonsterTypes.GHOST,(15,15))])
         self.load_map(self.get_tiles_path())
         self.load_items()
 
 
     def get_image_path(self):
-        return "resources/maps/Level03.png"
+        return "resources/maps/Level06.png"
 
     def get_tiles_path(self): #sciezka gdzie jest plik tekstowy opisujacy wyglad mapy
-        return "resources/maps/Level03.txt"
+        return "resources/maps/Level06.txt"
 
     #Metoda laduje itemy (Dots i Redballs)
     def load_items(self):
@@ -40,9 +40,19 @@ class Level03(GameMap):
         self.bonus_probability[BonusLife] = (0.5, None)
         self.bonus_probability[BonusMoney] = (0.5, None)
 
-        redDotPositions = [(1, 1),
-                           (15, 1),
-                           (1, 15),
+        redDotPositions = [(3, 13),
+                           (5, 11),
+                           (7 , 9),
+                           (7 , 8),
+                           (7 , 7),
+                           (8, 7),
+                           (8,8),
+                           (8,9),
+                           (9,7),
+                           (9,8),
+                           (9,9),
+                           (11,5),
+                           (13,3),
                           (15, 15)]
         #redDotPositions = []
 

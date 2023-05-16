@@ -8,12 +8,14 @@ from MapElements.Pacman import Pacman
 from Items.Item import Item
 from Items.Dot import Dot
 from Items.RedBall import RedBall
+from Items.Slow import Slow
 from random import randint
 from numpy.random import randint
 from Enums.MonsterTypes import *
 from MapElements.Skull import *
 from MapElements.Demon import *
-from Utility.GameSpec import GameSpec
+from MapElements.Ghost import *
+from Utility.GameSpec import *
 from Utility.KeyHandler import *
 from MapElements.Pacman import *
 from gui.Menu.Scenes.LevelStatusScene import STATUS, LevelStatusScene
@@ -26,14 +28,15 @@ class Engine(object):
         # CONSTANTS
         self.TPS = 120  # tick rate
         self.STARTING_LIVES = 3
-        self.MAX_MONSTERS_ALIVE = 4  # When __enemies_alive == MAX_ENEMIES_ALIVE then monsters don't spawn
+        self.MAX_MONSTERS_ALIVE = -1  # When __enemies_alive == MAX_ENEMIES_ALIVE then monsters don't spawn
         self.MONSTER_APEAR_TIME = 5  # Every 5 seconds a new monster appears as long as the monster limit isn't exceeded
         self.GROW_TIME = 0.5  # Every 0.5 seconds the newborn map_element grows in size until it becomes an adult
         # after 5 boosts (for pacman and monsters)
         self.DIE_TIME = 0.2  # Every 0.2 seconds map_element dies animation
         self.BONUS_APEAR_TIME = 10  # Every 10 seconds a random bonus appears on the map
         self.BONUS_DISAPEAR_TIME = 5  # After 10 seconds if not picked up - disappears
-        self.CAN_EAT_SKULLS_DURATION = 5  # Pacman can eat a skull for 10 seconds (when he picks up a red orb)
+        self.CAN_EAT_SKULLS_DURATION = 5  # Pacman can eat skulls for 5 seconds from when he picks up a red orb
+        self.ENEMIES_SLOWED_DURATION = 8
         self.BLINK_TIME = 5  # For 5 seconds, Pacman cannot cuff again
         self.ITEM_BLINK_TIME = 0.2  # Every 0.2 seconds items blink
         self.EAT_TIME_FACE = 0.1  # How much Pacman  mouth moves
@@ -46,6 +49,9 @@ class Engine(object):
         self.__dots_eaten = 0
         self.__can_eat_skulls = False
         self.__can_eat_skulls_remaining_time = -float('inf')
+        self.__enemies_are_slow_remaining_time = -float('inf')
+        self.__are_monsters_slowed = False
+
 
         # The flag is there to keep the monster dict from resizing when the engine iterates over it
         # The engine, after iterating through the dictionary, will unlock the ability to delete from the dictionary
@@ -72,6 +78,19 @@ class Engine(object):
         self.__C_CHECKER = CollisionChecker(self, self.__MAP)  # Responsible for moving and lifting items
         self.spawn_pacman(KEYH)
         self.__KEYH = KEYH
+        self.__difficulty = self.__GAME_SPEC.get_hardness()
+
+        if self.__difficulty == HARDNESS.EASY:
+            self.MAX_MONSTERS_ALIVE = 3
+            print("Easy mode")
+        elif self.__difficulty == HARDNESS.MEDIUM:
+            self.MAX_MONSTERS_ALIVE = 4
+            print("Medium mode")
+        else:
+            self.MAX_MONSTERS_ALIVE = 5
+            print("Hard mode")
+
+
 
     def spawn_pacman(self, KEYH):
         spawn_x = self.__MAP.get_pacman_spawn_x()
@@ -90,6 +109,9 @@ class Engine(object):
                                 self.next_monster_id, self.GROW_TIME, self.DIE_TIME, 4, 5)
             elif init_monster_type == MonsterTypes.DEMON:
                 monster = Demon(init_pos_x, init_pos_y, self.FIELD_SIZE, self.__C_CHECKER, self.__MAP, self,
+                                self.next_monster_id, self.GROW_TIME, self.DIE_TIME, 4, 5)
+            elif init_monster_type == MonsterTypes.GHOST:
+                monster = Ghost(init_pos_x, init_pos_y, self.FIELD_SIZE, self.__C_CHECKER, self.__MAP, self,
                                 self.next_monster_id, self.GROW_TIME, self.DIE_TIME, 4, 5)
 
         else:  # Random Monster
@@ -225,6 +247,11 @@ class Engine(object):
                         and pygame_time - self.__can_eat_skulls_remaining_time > self.CAN_EAT_SKULLS_DURATION * 1000):
                     self.make_skulls_predators()
 
+                pygame_time = pygame.time.get_ticks()
+                if (self.__are_monsters_slowed and pygame_time - self.__enemies_are_slow_remaining_time > self.ENEMIES_SLOWED_DURATION * 1000):
+                    self.return_normal_speed_to_enemies()
+
+
             else:  # if somebody wins
 
                 if self.__KEYH.space_pressed:
@@ -313,6 +340,8 @@ class Engine(object):
         elif isinstance(item, BonusMoney):
             # print("podniesiono kaske")
             self.__score += 10_000
+        elif isinstance(item,Slow):
+            self.slow_down_enemies()
 
         item.got_eaten()
 
@@ -410,5 +439,25 @@ class Engine(object):
 
         self.__is_monsters_vulnerable = False
 
-    # def item_ready_to_remove(self,item):
-    #    self.__MAP.remove_item(item)
+    def slow_down_enemies(self):
+        print("Enemies are getting slowed down")
+        for monster_id in self.__monsters:
+            monster = self.__monsters[monster_id]
+            if monster.get_is_alive() and not monster.get_is_newborn() and not isinstance(monster,Ghost):
+                self.__monsters[monster_id].set_speed(2)
+            elif monster.get_is_alive() and not monster.get_is_newborn(): #=> is a ghost
+                self.__monsters[monster_id].set_speed(1)
+
+        self.__enemies_are_slow_remaining_time = pygame.time.get_ticks()
+        self.__are_monsters_slowed = True
+
+    def return_normal_speed_to_enemies(self):
+        print("Returning normal speed to monsters")
+        for monster_id in self.__monsters:
+            monster = self.__monsters[monster_id]
+            if monster.get_is_alive() and not monster.get_is_newborn():
+                self.__monsters[monster_id].set_speed(monster.MAX_SPEED)
+
+        self.__are_monsters_slowed = False
+
+

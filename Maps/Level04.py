@@ -5,23 +5,24 @@ from Items.Dot import Dot
 from Items.RedBall import RedBall
 from Items.BonusLife import BonusLife
 from Items.BonusMoney import BonusMoney
+from Items.Slow import Slow
 from Maps.Tile import *
 from Enums.MonsterTypes import *
 
 
-class Level03(GameMap):
+class Level04(GameMap):
     def __init__(self,max_row,max_col,field_size):
-        super().__init__(max_row,max_col,field_size,field_size*8,field_size*15,
-                         [MonsterTypes.SKULL], [(8, 7)], [(MonsterTypes.SKULL,(8,8)),(MonsterTypes.DEMON,(1,8))])
+        super().__init__(max_row,max_col,field_size,field_size*8,field_size*11,
+                         [MonsterTypes.SKULL], [(8, 3)], [(MonsterTypes.SKULL,(3,8)),(MonsterTypes.GHOST,(3,13))])
         self.load_map(self.get_tiles_path())
         self.load_items()
 
 
     def get_image_path(self):
-        return "resources/maps/Level03.png"
+        return "resources/maps/Level04.png"
 
     def get_tiles_path(self): #sciezka gdzie jest plik tekstowy opisujacy wyglad mapy
-        return "resources/maps/Level03.txt"
+        return "resources/maps/level04.txt"
 
     #Metoda laduje itemy (Dots i Redballs)
     def load_items(self):
@@ -37,12 +38,18 @@ class Level03(GameMap):
         # self._items[(14, 3)] = BonusLife(3 * self.FIELD_SIZE, 14 * self.FIELD_SIZE, 0.5)
         # self._items[(2, 13)] = BonusMoney(13 * self.FIELD_SIZE, 2 * self.FIELD_SIZE, 0.5)
 
-        self.bonus_probability[BonusLife] = (0.5, None)
-        self.bonus_probability[BonusMoney] = (0.5, None)
+        self.bonus_probability[BonusLife] = (0.33, None)
+        self.bonus_probability[BonusMoney] = (0.33, None)
+        self.bonus_probability[Slow] = (0.33,None)
 
         redDotPositions = [(1, 1),
                            (15, 1),
+                           (6 , 1),
+                           (8 , 1),
+                           (6 , 15),
                            (1, 15),
+                           (8,15),
+                           (6,15),
                           (15, 15)]
         #redDotPositions = []
 

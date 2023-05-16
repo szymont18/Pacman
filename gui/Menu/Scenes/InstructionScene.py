@@ -21,6 +21,9 @@ class IScene(Enum):
     B_RED_BALL = 8
     B_MONEY = 9
     B_LIFE = 10
+    B_SLOW = 11
+    G_GHOST = 12
+
 
 
 class InstructionScene(Scene):
@@ -122,15 +125,22 @@ class InstructionScene(Scene):
         self.demon = [Image(Vector2d(500, 332), 50, 50, screen, f'resources/demon/D_left_{i}.png') for i in
                       range(1, 5)]
 
-        self.dot = [Image(Vector2d(500, 167), 50, 50, screen, f'resources/items/Dot.png')]
+        self.ghost_enemy = [Image(Vector2d(500, 519), 50, 50, screen, f'resources/ghost/G_LEFT_{i}.png') for i in
+                      range(1, 5)]
 
-        self.red_ball = [Image(Vector2d(500, 277), 50, 50, screen, f'resources/items/RedBall{i}.png') for i in range(1, 5)]
+        self.dot = [Image(Vector2d(500, 132), 50, 50, screen, f'resources/items/Dot.png')]
 
-        self.money = [Image(Vector2d(500, 387), 50, 50, screen, f'resources/items/BonusMoney{i}.png') for i in range(1, 3)]
+        self.red_ball = [Image(Vector2d(500, 232), 50, 50, screen, f'resources/items/RedBall{i}.png') for i in
+                         range(1, 5)]
 
-        self.life = [Image(Vector2d(500, 497), 50, 50, screen, f'resources/items/BonusLife{i}.png') for i in range(1, 5)]
+        self.money = [Image(Vector2d(500, 332), 50, 50, screen, f'resources/items/BonusMoney{i}.png') for i in
+                      range(1, 3)]
 
+        self.life = [Image(Vector2d(500, 432), 50, 50, screen, f'resources/items/BonusLife{i}.png') for i in
+                     range(1, 5)]
 
+        self.slow = [Image(Vector2d(500, 532), 50, 50, screen, f'resources/items/SLOW_{i}.png') for i in
+                     range(1, 3)]
 
         # Specification for further explanation of game element - ghost (their tactics), bonus (what they do)
 
@@ -140,17 +150,23 @@ class InstructionScene(Scene):
         self.demon_button = Button(Vector2d(550, 327), 60, 50, "Demon", screen,
                                    lambda: self.change_instruction_scene(IScene.G_DEMON), font_size=25)
 
-        self.dot_button = Button(Vector2d(550, 162), 60, 50, "Dot", screen,
-                                   lambda: self.change_instruction_scene(IScene.B_DOT), font_size=25)
+        self.ghost_enemy_button = Button(Vector2d(550, 519), 60, 50, "Ghost", screen,
+                                   lambda: self.change_instruction_scene(IScene.G_GHOST), font_size=25)
 
-        self.red_ball_button = Button(Vector2d(550, 272), 60, 50, "Red Ball", screen,
-                                   lambda: self.change_instruction_scene(IScene.B_RED_BALL), font_size=25)
+        self.dot_button = Button(Vector2d(550, 128), 60, 50, "Dot", screen,
+                                 lambda: self.change_instruction_scene(IScene.B_DOT), font_size=25)
 
-        self.money_button = Button(Vector2d(550, 382), 60, 50, "Money", screen,
+        self.red_ball_button = Button(Vector2d(550, 228), 60, 50, "Red Ball", screen,
+                                      lambda: self.change_instruction_scene(IScene.B_RED_BALL), font_size=25)
+
+        self.money_button = Button(Vector2d(550, 328), 60, 50, "Money", screen,
                                    lambda: self.change_instruction_scene(IScene.B_MONEY), font_size=25)
 
-        self.life_button = Button(Vector2d(550, 492), 60, 50, "Life", screen,
-                                   lambda: self.change_instruction_scene(IScene.B_LIFE), font_size=25)
+        self.life_button = Button(Vector2d(550, 428), 60, 50, "Life", screen,
+                                  lambda: self.change_instruction_scene(IScene.B_LIFE), font_size=25)
+
+        self.slow_button = Button(Vector2d(550, 528), 60, 50, "Slow", screen,
+                                  lambda: self.change_instruction_scene(IScene.B_SLOW), font_size=25)
 
         self.demon_plain_text = "Demon is one of the smarter enemies. It can recognize Pacman and follow him if he is" \
                                 "in the same column or row. It is very difficult to shake off, so try not to " \
@@ -159,7 +175,11 @@ class InstructionScene(Scene):
         self.skull_plain_text = "The Skull is a less intelligent enemy. It moves randomly around the map and is not " \
                                 "interested in fighting until you come into contact with it."
 
-        self.life_plain_text = "After eating this bonus, the player receives an extra life. They can have an infinite "\
+        self.ghost_enemy_plain_text = "A ghost is a type of enemy that can pass through walls. It is difficult to ' \
+                                       'lose track of it. It is also immune to being eaten (when Pacman eats a Red ' \
+                                      'Ball)."
+
+        self.life_plain_text = "After eating this bonus, the player receives an extra life. They can have an infinite " \
                                "number of lives, but only 5 lives will be displayed on the health bar."
 
         self.money_plain_text = "After eating this bonus, the player receives an additional 10,000 points."
@@ -171,18 +191,28 @@ class InstructionScene(Scene):
         self.dot_plain_text = "Dots are the basic bonuses that appear on the map. The player must eat all of them to " \
                               "progress to the next level (and ultimately win the game)."
 
+        self.slow_plain_text = "After eating this bonus, all monsters slow down, giving you a chance to either escape "\
+                               "or defeat them."
+
         self.exp_scene_map = {IScene.G_DEMON: GhostBonusScene(self.screen, "Demon", self.demon_plain_text,
                                                               [f'resources/demon/D_left_{i}.png' for i in range(1, 5)]),
                               IScene.G_SKULL: GhostBonusScene(self.screen, "Skull", self.skull_plain_text,
                                                               [f'resources/skull/S_LEFT_{i}.png' for i in range(1, 5)]),
                               IScene.B_LIFE: GhostBonusScene(self.screen, "Life", self.life_plain_text,
-                                                              [f'resources/items/BonusLife{i}.png' for i in range(1, 5)]),
+                                                             [f'resources/items/BonusLife{i}.png' for i in
+                                                              range(1, 5)]),
                               IScene.B_DOT: GhostBonusScene(self.screen, "Dot", self.dot_plain_text,
-                                                              [f'resources/items/Dot.png']),
+                                                            [f'resources/items/Dot.png']),
                               IScene.B_RED_BALL: GhostBonusScene(self.screen, "Red Ball", self.red_ball_plain_text,
-                                                              [f'resources/items/RedBall{i}.png' for i in range(1, 5)]),
+                                                                 [f'resources/items/RedBall{i}.png' for i in
+                                                                  range(1, 5)]),
                               IScene.B_MONEY: GhostBonusScene(self.screen, "Money", self.money_plain_text,
-                                                              [f'resources/items/BonusMoney{i}.png' for i in range(1, 3)])
+                                                              [f'resources/items/BonusMoney{i}.png' for i in
+                                                               range(1, 3)]),
+                              IScene.B_SLOW: GhostBonusScene(self.screen, "Slow", self.slow_plain_text,
+                                                             [f'resources/items/SLOW_{i}.png' for i in range(1, 3)]),
+                              IScene.G_GHOST: GhostBonusScene(self.screen, "Slow", self.ghost_enemy_plain_text,
+                                                             [f'resources/ghost/G_LEFT_{i}.png' for i in range(1, 5)]),
                               }
 
         # Return to one of the specific explanation
@@ -226,9 +256,12 @@ class InstructionScene(Scene):
             self.bonus_button.draw()
             self.demon_button.draw()
             self.skull_button.draw()
+            self.ghost_enemy_button.draw()
             self.demon[self.sprite_nr % len(self.demon)].draw()
             self.skull[self.sprite_nr % len(self.skull)].draw()
+            self.ghost_enemy[self.sprite_nr % len(self.skull)].draw()
 
+            self.ghost_enemy_button.is_clicked(mouse)
             self.demon_button.is_clicked(mouse)
             self.skull_button.is_clicked(mouse)
             self.pacman_button2.is_clicked(mouse)
@@ -243,12 +276,15 @@ class InstructionScene(Scene):
             self.dot[self.sprite_nr % len(self.dot)].draw()
             self.red_ball[self.sprite_nr % len(self.red_ball)].draw()
             self.money[self.sprite_nr % len(self.money)].draw()
+            self.slow[self.sprite_nr % len(self.slow)].draw()
 
+            self.slow_button.draw()
             self.life_button.draw()
             self.dot_button.draw()
             self.red_ball_button.draw()
             self.money_button.draw()
 
+            self.slow_button.is_clicked(mouse)
             self.life_button.is_clicked(mouse)
             self.dot_button.is_clicked(mouse)
             self.red_ball_button.is_clicked(mouse)
@@ -266,4 +302,3 @@ class InstructionScene(Scene):
     def change_instruction_scene(self, new_scene):
         self.prev_instruction_scene = self.instruction_scene_pointer
         self.instruction_scene_pointer = new_scene
-

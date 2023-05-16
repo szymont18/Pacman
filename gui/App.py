@@ -17,6 +17,9 @@ from Maps.GameMap import *
 from Maps.Level01 import *
 from Maps.Level02 import *
 from Maps.Level03 import *
+from Maps.Level04 import *
+from Maps.Level05 import *
+from Maps.Level06 import *
 from Enums.TileType import *
 from enum import Enum
 
@@ -144,6 +147,8 @@ class App:
     #     pass
 
     def draw_menu(self):
+        self.menu.draw(None)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.KEEP_RUNNING = False
@@ -169,7 +174,14 @@ class App:
             game_map = Level01(self.MAX_ROW, self.MAX_COL, self.FIELD_SIZE)
         elif level_id == 1:
             game_map = Level02(self.MAX_ROW, self.MAX_COL, self.FIELD_SIZE)
-        elif level_id == 2:                game_map = Level03(self.MAX_ROW, self.MAX_COL, self.FIELD_SIZE)
+        elif level_id == 2:
+            game_map = Level03(self.MAX_ROW, self.MAX_COL, self.FIELD_SIZE)
+        elif level_id == 3:
+            game_map = Level04(self.MAX_ROW,self.MAX_COL,self.FIELD_SIZE)
+        elif level_id == 4:
+            game_map = Level05(self.MAX_ROW,self.MAX_COL,self.FIELD_SIZE)
+        elif level_id == 5:
+            game_map = Level06(self.MAX_ROW,self.MAX_COL,self.FIELD_SIZE)
 
         else:
             return -1
@@ -179,13 +191,14 @@ class App:
         return engine.run()
 
     def draw_status(self, game_response, level_id):
+        self.clear_map()
         if game_response is not None:
             self.GAME_SPEC.set_start_game(False)
 
-        if game_response == STATUS.LVL_WIN and level_id == 2:
+        if game_response == STATUS.LVL_WIN and level_id == 5:
             self.level_status_scene.change_game_status(STATUS.GAME_WIN)
 
-        elif game_response == STATUS.LVL_WIN and level_id < 2:
+        elif game_response == STATUS.LVL_WIN and level_id < 5:
             self.level_status_scene.change_game_status(STATUS.LVL_WIN)
 
         elif game_response == STATUS.LVL_LOSE:

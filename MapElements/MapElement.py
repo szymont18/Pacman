@@ -9,14 +9,14 @@ import time
 # Overriding class for all mobs in the game (monsters + pacman)
 class MapElement(ABC):
     def __init__(self, POS_X, POS_Y, FIELD_SIZE, C_CHECKER, MAP, SPRITE_CHG_TIME, SPRITE_ON_DEATH_CHG_TIME, ENGINE,
-                 MAX_DIE_SPRITES, MAX_SPAWN_SPRITES):
+                 MAX_DIE_SPRITES, MAX_SPAWN_SPRITES,MAX_SPEED=3):
         self.POS_X = POS_X
         self.POS_Y = POS_Y
         self.SOLID_AREA = pygame.Rect(5, 5, FIELD_SIZE - 10, FIELD_SIZE - 10)
         self._C_CHECKER = C_CHECKER
         self._MAP = MAP
         self._direction = Direction.RIGHT
-        self.MAX_SPEED = 3  # Max and casual speed
+        self.MAX_SPEED = MAX_SPEED  # Max and casual speed
         self._speed = 0  # Actual speed
         self.FIELD_SIZE = FIELD_SIZE
         self.SPRITE_CHG_TIME = SPRITE_CHG_TIME
