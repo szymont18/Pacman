@@ -15,7 +15,7 @@ class Skull(MapElement):
                          MAX_SPAWN_SPRITES)
         self.MONSTER_ID = MONSTER_ID  # Unique ID
         self.__is_vulnerable = False  # Pacman can not eat Skull unless he previously has eaten red dot
-
+        self.ENGINE = ENGINE
         # In the future, it's worth changing the growstage to cur_sprite_nr when the textures are ready
 
     # Override
@@ -61,7 +61,7 @@ class Skull(MapElement):
 
         if self._C_CHECKER.crosses_with_pacman(self):
             if self.__is_vulnerable:
-                self.kill()
+                self.ENGINE.kill_Skull(self)
             else:
                 self._ENGINE.hurt_pacman()
 

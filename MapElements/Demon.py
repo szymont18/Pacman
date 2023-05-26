@@ -22,6 +22,8 @@ class Demon(MapElement):
     def get_image_path(self):
         if self._is_newborn:
             return f"resources/demon/D_EGG_{self._cur_sprite_nr}.png"
+        elif self._is_killed:
+            return f"resources/demon/DemonDeath{self._cur_sprite_nr}.png"
 
         return f"resources/demon/D_{self._direction}_{self._cur_sprite_nr}.png"
 

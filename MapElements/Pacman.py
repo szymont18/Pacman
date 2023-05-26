@@ -3,6 +3,8 @@ from Enums import Direction as Direction
 from Enums.Direction import *
 import pygame
 import time
+#from MapElements import MapElement
+#from MapElement import MapElement
 
 
 class Pacman(MapElement):
@@ -24,6 +26,7 @@ class Pacman(MapElement):
         self.__hurt_clock = -float('inf')
         self.__last_blink = -float('inf')
         self.__BLINK_TIME = BLINK_TIME
+        self.__played_epilog_animation = False #Level should end when pacman finishes his animation
 
         # Variables responsible for sprites changing
         self.__EAT_TIME_FACE = EAT_TIME_FACE
@@ -95,10 +98,8 @@ class Pacman(MapElement):
         # Check if we crossed the item
         item = self._C_CHECKER.check_for_items(self)
 
-        if item is not None and not item.get_is_eaten():
-            # print("Picked up") self._MAP.remove_item(item) # we remove the item from the map so that it will not be
-            # displayed (Moved this functionality to the engine)
-            self._ENGINE.picked_up(item)  # Inform engine to take on bonus
+        if item is not None and not item.get_is_eaten() and self._C_CHECKER.crosses_with_pacman(item):
+            self._ENGINE.picked_up(item)  # Inform engine to take the bonus
 
     def win(self):
         self.__won = True
@@ -109,9 +110,12 @@ class Pacman(MapElement):
     def update(self):
         if self.__won:
             time_now = time.time()
-            if time_now - self._last_sprite_chg > self.SPRITE_CHG_TIME and self._cur_sprite_nr < 4:
-                self._cur_sprite_nr += 1
-                self._last_sprite_chg = time_now
+            if time_now - self._last_sprite_chg > self.SPRITE_CHG_TIME:
+                if self._cur_sprite_nr < 4:
+                    self._cur_sprite_nr += 1
+                    self._last_sprite_chg = time_now
+                else:
+                    self.__played_epilog_animation = True
         else:
             super().update()
 
@@ -139,3 +143,9 @@ class Pacman(MapElement):
 
     def set_visible(self, visible):
         self.__visible = visible
+
+    def get_played_epilog_animation(self):
+        return self.__played_epilog_animation
+
+    def set_played_epilog_animation(self,val):
+        self.__played_epilog_animation = val

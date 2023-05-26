@@ -3,13 +3,7 @@ from time import sleep
 
 import pygame.time
 
-from Enums.SceneTypes import SceneTypes
-from MapElements.Vector2d import Vector2d
-from Utility.GameSpec import GameSpec
-from gui.Menu.Components.Scene import Scene
-from gui.Menu.Components.TextArea import TextArea
 from gui.Menu.Menu import Menu
-from gui.Menu.Scenes.LevelStatusScene import LevelStatusScene, STATUS
 from gui.TextureFactory import *
 from Utility.Engine import *
 from MapElements.MapElement import *
@@ -20,6 +14,12 @@ from Maps.Level03 import *
 from Maps.Level04 import *
 from Maps.Level05 import *
 from Maps.Level06 import *
+from Maps.Level07 import *
+from Maps.Level08 import *
+from Maps.Level09 import *
+from Maps.Level10 import *
+from Maps.Level11 import *
+
 from Enums.TileType import *
 from enum import Enum
 
@@ -96,10 +96,14 @@ class App:
         for row in range(self.MAX_ROW):
             for col in range(self.MAX_COL):
                 x, y = col * self.FIELD_SIZE, row * self.FIELD_SIZE
-                if game_map.TILES[row][col].TYPE == TileType.WALL:
+                type = game_map.TILES[row][col].TYPE
+                if type == TileType.WALL:
                     self.window.blit(game_map.get_wall_image(), (x, y))
-                else:
+                elif type == TileType.VOID:
                     self.window.blit(game_map.get_void_image(), (x, y))
+                elif type == TileType.CROSS:
+                    self.window.blit(game_map.get_cross_image(), (x, y))
+
 
     def draw_items(self, game_map: GameMap):
         items = game_map.get_items()
@@ -162,29 +166,12 @@ class App:
             self.menu.draw(self.event)
 
     def launch_game(self):
-        # Game
-        response = None
-        level_id = None
-
         level_id = self.GAME_SPEC.get_level_to_play()
-        hardness = self.GAME_SPEC.get_hardness()  # Should do sth to change hardness of the game (number of enemies)            # TODO After map parsing
+        #hardness = self.GAME_SPEC.get_hardness()  # Should do sth to change hardness of the game (number of enemies)            # TODO After map parsing
 
-        game_map = None
-        if level_id == 0:
-            game_map = Level01(self.MAX_ROW, self.MAX_COL, self.FIELD_SIZE)
-        elif level_id == 1:
-            game_map = Level02(self.MAX_ROW, self.MAX_COL, self.FIELD_SIZE)
-        elif level_id == 2:
-            game_map = Level03(self.MAX_ROW, self.MAX_COL, self.FIELD_SIZE)
-        elif level_id == 3:
-            game_map = Level04(self.MAX_ROW,self.MAX_COL,self.FIELD_SIZE)
-        elif level_id == 4:
-            game_map = Level05(self.MAX_ROW,self.MAX_COL,self.FIELD_SIZE)
-        elif level_id == 5:
-            game_map = Level06(self.MAX_ROW,self.MAX_COL,self.FIELD_SIZE)
-
-        else:
-            return -1
+        levels = [Level01,Level02,Level03,Level04,Level05,Level06,Level07,Level08,Level09,Level10,Level11]
+        actual_level = levels[level_id]
+        game_map = actual_level(self.MAX_ROW, self.MAX_COL, self.FIELD_SIZE)
 
         engine = Engine(game_map, self.MAX_ROW, self.MAX_COL, self, self.__KEYH, self.FIELD_SIZE,
                             self.GAME_SPEC)
@@ -195,10 +182,10 @@ class App:
         if game_response is not None:
             self.GAME_SPEC.set_start_game(False)
 
-        if game_response == STATUS.LVL_WIN and level_id == 5:
+        if game_response == STATUS.LVL_WIN and level_id == 10:
             self.level_status_scene.change_game_status(STATUS.GAME_WIN)
 
-        elif game_response == STATUS.LVL_WIN and level_id < 5:
+        elif game_response == STATUS.LVL_WIN and level_id < 10:
             self.level_status_scene.change_game_status(STATUS.LVL_WIN)
 
         elif game_response == STATUS.LVL_LOSE:

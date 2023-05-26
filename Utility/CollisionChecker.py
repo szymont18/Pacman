@@ -3,6 +3,7 @@ import pygame
 from MapElements import MapElement
 from Enums import Direction as Direction
 from Enums.Direction import *
+from Items import Item
 
 
 class CollisionChecker:
@@ -148,12 +149,18 @@ class CollisionChecker:
 
         return None
 
-    # Method to be used by sprites - checks if a sprite overlaps pacman
+    # Method verifies if element/item colides with pacman
     def crosses_with_pacman(self, element):
         pacman_pos_x, pacman_pos_y = self.__ENGINE.get_pacman_pos()
+        solid_area = element.get_solid_area()
 
-        rect1 = pygame.Rect(element.get_pos_x(), element.get_pos_y(), self.__ENGINE.FIELD_SIZE - 10,
+        rect1 = pygame.Rect(element.get_pos_x() + solid_area.left,
+                            element.get_pos_y() + solid_area.top,
+                            solid_area.width,
+                            solid_area.height)
+
+        rect2 = pygame.Rect(pacman_pos_x, pacman_pos_y, self.__ENGINE.FIELD_SIZE - 10,
                             self.__ENGINE.FIELD_SIZE - 10)
-        rect2 = pygame.Rect(pacman_pos_x, pacman_pos_y, self.__ENGINE.FIELD_SIZE - 10, self.__ENGINE.FIELD_SIZE - 10)
 
         return rect1.colliderect(rect2)
+

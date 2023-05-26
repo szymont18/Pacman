@@ -4,9 +4,10 @@ from Enums import Direction as Direction
 from Enums.Direction import *
 import pygame
 import time
+#from MapElements.Pacman import Pacman
+#from MapElements.Pacman import *
 
 
-# Overriding class for all mobs in the game (monsters + pacman)
 class MapElement(ABC):
     def __init__(self, POS_X, POS_Y, FIELD_SIZE, C_CHECKER, MAP, SPRITE_CHG_TIME, SPRITE_ON_DEATH_CHG_TIME, ENGINE,
                  MAX_DIE_SPRITES, MAX_SPAWN_SPRITES,MAX_SPEED=3):
@@ -98,16 +99,14 @@ class MapElement(ABC):
                 self._last_sprite_chg = time_now
                 if self._cur_sprite_nr == self.MAX_DIE_SPRITES:
                     self._ENGINE.map_element_died(self)
-
-        # else:
-        #    time_now = time.time()
-        #   self._cur_sprite_nr = (self._cur_sprite_nr + 1) % 5
-        #   self._cur_sprite_nr = self._cur_sprite_nr if self._cur_sprite_nr != 0 else 1
-        #   self.__last_sprite_change = time_now
+                    #if isinstance(self,Pacman): #Pacman has to finish his animation before game ends
+                    #    self.set_played_epilog_animation(True)
 
     def kill(self):  # kill map Element
-        if self._is_killed: return  # if he's already dead, don't kill him again (this if is so that it doesn't reset
-        # sprite_nr if someone steps on it again)
+        if self._is_killed: return  # if he's already dead, don't kill him again
         self._is_killed = True
         self._speed = 0
         self._cur_sprite_nr = 1
+
+    def get_solid_area(self):
+        return self.SOLID_AREA

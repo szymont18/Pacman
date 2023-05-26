@@ -5,11 +5,13 @@ from Maps.Tile import *
 from Parsers.TileTypeParse import *
 from Items.Item import *
 import pygame
+from Items.Dot import Dot
+from Items.RedBall import RedBall
 
 
 class GameMap(ABC):
     def __init__(self, MAX_COL, MAX_ROW, FIELD_SIZE, PACMAN_SPAWN_X, PACMAN_SPAWN_Y,
-                 POSSIBLE_MONSTERS, MONSTER_SPAWN_TILES, ONLOAD_SPAWN_MONSTERS):
+                 POSSIBLE_MONSTERS, MONSTER_SPAWN_TILES, ONLOAD_SPAWN_MONSTERS,RED_DOT_POSITIONS):
         self.MAX_COL = MAX_COL
         self.MAX_ROW = MAX_ROW
 
@@ -21,15 +23,16 @@ class GameMap(ABC):
         self.TILES = [[None for __ in range(self.MAX_COL)] for _ in range(self.MAX_ROW)]
         self.TILES[0][5] = 5
 
-        self._items = dict()
+        self._items = dict() #Dict for all items (dots,keys...)
         self.bonus_probability = dict()
         self.__void_places = {}
 
         self.MONSTER_SPAWN_TILES = MONSTER_SPAWN_TILES  # Tiles where monsters can spawn
         self.POSSIBLE_MONSTERS = POSSIBLE_MONSTERS
-        self.ONLOAD_SPAWN_MONSTERS = ONLOAD_SPAWN_MONSTERS  # Monsters that are spawn when game started
+        self.ONLOAD_SPAWN_MONSTERS = ONLOAD_SPAWN_MONSTERS  # Monsters that are spawn when game
         # ( they are not random)
 
+        self.__RED_DOT_POSITIONS = RED_DOT_POSITIONS
         self._total_dots = -1  # It's supposed to be a constant, but it can't be set during initialization,
         # so it's not a constant in the end
 
@@ -37,6 +40,8 @@ class GameMap(ABC):
         self._void_image = pygame.transform.scale(pygame.image.load("resources/tiles/void.png"),
                                                   (self.FIELD_SIZE, self.FIELD_SIZE)).convert()
         self._wall_image = pygame.transform.scale(pygame.image.load("resources/tiles/wall.png"),
+                                                  (self.FIELD_SIZE, self.FIELD_SIZE)).convert()
+        self._cross_image = pygame.transform.scale(pygame.image.load("resources/tiles/cross.png"),
                                                   (self.FIELD_SIZE, self.FIELD_SIZE)).convert()
 
     def set_total_dots(self, total_dots):
@@ -53,6 +58,10 @@ class GameMap(ABC):
 
     @abstractmethod
     def get_image_path(self):
+        pass
+
+    @abstractmethod
+    def get_music_path(self):
         pass
 
     # zaladowanie mapy z pliku (Metoda wykonuje sie tylko raz w trakcie inicjalizacji mapy)
@@ -86,10 +95,21 @@ class GameMap(ABC):
                 if col < self.MAX_COL - 1 and self.TILES[row][col + 1].COLLISION == False:
                     self.TILES[row][col].add_possible_turn(Direction.RIGHT)
 
-    # Classes inheriting from here place items on the map (dots, bonuses, etc.)
-    @abstractmethod
+
     def load_items(self):
-        pass
+        for i in range(self.MAX_ROW):
+            for j in range(self.MAX_COL):
+                if self.TILES[i][j].TYPE == TileType.VOID:
+                    para = (i, j)
+                    self._items[para] = Dot(j * self.FIELD_SIZE, i * self.FIELD_SIZE, self)
+
+        self.set_total_dots(len(self._items.keys()) -
+                               len(self.__RED_DOT_POSITIONS))  # The number of white dots is described by this equation
+
+        for para in self.__RED_DOT_POSITIONS:
+            self._items.pop(para)  # Removing the white dot
+            self._items[para] = RedBall(para[1] * self.FIELD_SIZE, para[0] * self.FIELD_SIZE,
+                                        self)  # Insert Red Dot
 
     def get_collision_status(self, row: int, col: int):
         row = row % self.MAX_ROW
@@ -135,3 +155,6 @@ class GameMap(ABC):
 
     def get_wall_image(self):
         return self._wall_image
+
+    def get_cross_image(self):
+        return self._cross_image

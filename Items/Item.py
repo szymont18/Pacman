@@ -33,6 +33,18 @@ class Item:
     def get_image_path(self):  # abstract
         pass
 
+    @abstractmethod
+    def get_sound_path(self):
+        pass
+
+    def get_pos_x(self):
+        return self.POS_X
+
+    def get_pos_y(self):
+        return self.POS_Y
+
+    def get_solid_area(self):
+        return self.SOLID_AREA
     # def set_activity(self, new):
     #    self.is_active = new
 

@@ -7,5 +7,7 @@ class TileTypeParser:
             return TileType.VOID
         elif type == 1:
             return TileType.WALL
+        elif type == 2:
+            return TileType.CROSS
         else:
             raise Exception(str(int) + " is not a legal TileType in TileTypeParser/parse")

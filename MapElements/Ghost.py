@@ -22,6 +22,8 @@ class Ghost(MapElement):
     def get_image_path(self):
         if self._is_newborn:
             return f"resources/ghost/G_EGG_{self._cur_sprite_nr}.png"
+        elif self._is_killed:
+            return f"resources/ghost/GhostDeath{self._cur_sprite_nr}.png"
 
         return f"resources/ghost/G_{self._direction}_{self._cur_sprite_nr}.png"
 
@@ -64,16 +66,6 @@ class Ghost(MapElement):
             #if new_direction is not None and self._C_CHECKER.can_move(self, new_direction):
             #    self._direction = new_direction
             self._direction = new_direction #Ghost doesnt have to chech for collisions with walls
-
-        # If skull can not go straight it go to random direction which is available
-        #if not self._C_CHECKER.can_move(self, self._direction):
-
-        #    directions = [Direction.UP, Direction.LEFT, Direction.RIGHT, Direction.DOWN]
-        #    random.shuffle(directions)  # Randomness
-        #    for direction in directions:  # Iterate through directions to check which is available
-        #        if self._C_CHECKER.can_move(self, direction):
-        #            self._direction = direction  # Change direction
-        #            break
 
         # Monster is moving ( we know that this directory is correct)
         if self._direction == Direction.UP:
