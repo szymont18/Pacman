@@ -17,6 +17,7 @@ from MapElements.Skull import *
 from MapElements.Demon import *
 from MapElements.Ghost import *
 from Utility.GameSpec import *
+from Maps.Level04 import Level04
 from Utility.KeyHandler import *
 from MapElements.Pacman import *
 from gui.Menu.Scenes.LevelStatusScene import STATUS, LevelStatusScene
@@ -187,6 +188,8 @@ class Engine(object):
 
     #Start the level
     def run(self):
+        self.__APP.assign_pacman(self.__pacman) #App will need pacman if we render with centered pacman
+
         #Music
         self.MUSIC_BACKGROUND = pygame.mixer.music.load(self.__MAP.get_music_path())
         pygame.mixer.music.play(-1)
@@ -223,7 +226,8 @@ class Engine(object):
                 #    self.update()
                 #    self.pacman_won()
 
-                if self.__dots_eaten == self.__MAP.get_total_dots():
+                if (self.__dots_eaten == self.__MAP.get_total_dots() and not isinstance(self.__MAP,Level04) or
+                    (isinstance(self.__MAP,Level04) and self.__dots_eaten == self.__MAP.get_total_dots()+1 )): #Bug Fix
                     #self.update() #Moze te update wywalic nad ify
                     self.pacman_won()
 
@@ -299,6 +303,7 @@ class Engine(object):
         self.__APP.clear_map()  # Clear map
         self.__APP.draw_map(self.__MAP)
         self.__APP.draw_items(self.__MAP)
+        #self.__APP.draw_portals(self.__MAP)
 
         if self.__pacman.is_visible():
             self.__APP.draw_map_element(self.__pacman)

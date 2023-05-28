@@ -10,10 +10,11 @@ from Items.RedBall import RedBall
 
 
 class GameMap(ABC):
-    def __init__(self, MAX_COL, MAX_ROW, FIELD_SIZE, PACMAN_SPAWN_X, PACMAN_SPAWN_Y,
-                 POSSIBLE_MONSTERS, MONSTER_SPAWN_TILES, ONLOAD_SPAWN_MONSTERS,RED_DOT_POSITIONS):
-        self.MAX_COL = MAX_COL
+    def __init__(self, MAX_ROW, MAX_COL, FIELD_SIZE, PACMAN_SPAWN_X, PACMAN_SPAWN_Y,
+                 POSSIBLE_MONSTERS, MONSTER_SPAWN_TILES, ONLOAD_SPAWN_MONSTERS,RED_DOT_POSITIONS,RENDER_TYPE,PORTALS = None):
         self.MAX_ROW = MAX_ROW
+        self.MAX_COL = MAX_COL
+
 
         self.FIELD_SIZE = FIELD_SIZE
 
@@ -21,7 +22,7 @@ class GameMap(ABC):
         self.PACMAN_SPAWN_Y = PACMAN_SPAWN_Y
 
         self.TILES = [[None for __ in range(self.MAX_COL)] for _ in range(self.MAX_ROW)]
-        self.TILES[0][5] = 5
+        #self.TILES[0][5] = 5
 
         self._items = dict() #Dict for all items (dots,keys...)
         self.bonus_probability = dict()
@@ -29,20 +30,15 @@ class GameMap(ABC):
 
         self.MONSTER_SPAWN_TILES = MONSTER_SPAWN_TILES  # Tiles where monsters can spawn
         self.POSSIBLE_MONSTERS = POSSIBLE_MONSTERS
-        self.ONLOAD_SPAWN_MONSTERS = ONLOAD_SPAWN_MONSTERS  # Monsters that are spawn when game
-        # ( they are not random)
+        self.ONLOAD_SPAWN_MONSTERS = ONLOAD_SPAWN_MONSTERS  # Monsters that spawn when game starts
+        #self.PORTALS = PORTALS
 
         self.__RED_DOT_POSITIONS = RED_DOT_POSITIONS
         self._total_dots = -1  # It's supposed to be a constant, but it can't be set during initialization,
         # so it's not a constant in the end
 
-        # For drawing
-        self._void_image = pygame.transform.scale(pygame.image.load("resources/tiles/void.png"),
-                                                  (self.FIELD_SIZE, self.FIELD_SIZE)).convert()
-        self._wall_image = pygame.transform.scale(pygame.image.load("resources/tiles/wall.png"),
-                                                  (self.FIELD_SIZE, self.FIELD_SIZE)).convert()
-        self._cross_image = pygame.transform.scale(pygame.image.load("resources/tiles/cross.png"),
-                                                  (self.FIELD_SIZE, self.FIELD_SIZE)).convert()
+        # Should map be drawn tile by tile or just 1 image (Tile by tile is meant to be for custom maps and big maps)
+        self.RENDER_TYPE = RENDER_TYPE
 
     def set_total_dots(self, total_dots):
         self._total_dots = total_dots
@@ -75,6 +71,7 @@ class GameMap(ABC):
             for number in line.split():
                 number_int = int(number)
                 self.TILES[row][col] = Tile(TileTypeParser.parse(number_int), pos_x, pos_y)
+               # print(row, col,self.TILES[row][col])
                 col += 1
             if col > self.MAX_COL - 1:
                 row += 1
@@ -149,12 +146,3 @@ class GameMap(ABC):
 
     def clear_items(self):
         self._items = dict()
-
-    def get_void_image(self):
-        return self._void_image
-
-    def get_wall_image(self):
-        return self._wall_image
-
-    def get_cross_image(self):
-        return self._cross_image

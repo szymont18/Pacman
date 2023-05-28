@@ -21,3 +21,16 @@ class Tile:
 
     def get_possible_turns(self):
         return self.__possible_turns
+
+    def get_image_path(self):
+        if self.TYPE == TileType.VOID:
+            return "resources/tiles/VOID.png"
+        elif self.TYPE == TileType.WALL:
+            return "resources/tiles/WALL.png"
+        elif self.TYPE == TileType.CROSS:
+            return "resources/tiles/CROSS.png"
+        elif self.TYPE == TileType.LAVA:
+            return "resources/tiles/LAVA.png"
+
+    def __str__(self):
+        return self.TYPE.__str__()

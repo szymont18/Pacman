@@ -4,18 +4,20 @@ from Enums.MonsterTypes import *
 from Items.BonusLife import BonusLife
 from Items.Nuke import Nuke
 from Items.BonusMoney import BonusMoney
-
+from Enums.RenderType import *
 
 class Level09(GameMap):
-    def __init__(self,max_row,max_col,field_size):
-        super().__init__(max_row, max_col, field_size,
+    def __init__(self,field_size):
+        super().__init__(MAX_ROW = 17,
+                         MAX_COL = 17,
+                         FIELD_SIZE = field_size,
                          PACMAN_SPAWN_X=field_size * 8,
                          PACMAN_SPAWN_Y=field_size * 6,
                          POSSIBLE_MONSTERS=[MonsterTypes.SKULL],
                          MONSTER_SPAWN_TILES=[(1, 1)],
                          ONLOAD_SPAWN_MONSTERS=[(MonsterTypes.SKULL,(1,1)), (MonsterTypes.DEMON,(15,15))],
-                         RED_DOT_POSITIONS=[(1, 7),(1, 9),(9,1),(9,15),(11,1),(12,1),(12,15),(11,15)]
-                         )
+                         RED_DOT_POSITIONS=[(1, 7),(1, 9),(9,1),(9,15),(11,1),(12,1),(12,15),(11,15)],
+                         RENDER_TYPE=RenderType.SINGLE_IMAGE)
 
         #self.bonus_probability[BonusLife] = (0.4, None)
         #self.bonus_probability[BonusMoney] = (0.2, None)
@@ -29,10 +31,10 @@ class Level09(GameMap):
 
 
     def get_image_path(self):
-        return "resources/maps/Level09.png"
+        return "resources/maps/Level9.png"
 
     def get_tiles_path(self): #sciezka gdzie jest plik tekstowy opisujacy wyglad mapy
-        return "resources/maps/Level09.txt"
+        return "resources/maps/Level9.txt"
 
     def get_music_path(self):
         return "resources/music/15.MID"

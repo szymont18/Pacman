@@ -7,6 +7,8 @@ class TileType(Enum):
     CROSS = 2
     HORIZONTAL_GATE = 3
     VERTICAL_GATE = 4
+    LAVA = 5
+
 
     def __str__(self):
         if self == TileType.WALL:
@@ -19,4 +21,6 @@ class TileType(Enum):
             return "HGATE"
         elif self == TileType.VERTICAL_GATE:
             return "VGATE"
+        elif self == TileType.LAVA:
+            return "LAVA"
 

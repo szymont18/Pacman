@@ -36,7 +36,7 @@ class Button:
 
     def is_clicked(self, event):
 
-        if event is not None:
+        if event is not None and (event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.MOUSEMOTION):
             if self.button.collidepoint(event.pos):
                 self.actual_font_rgb = self.on_click_font_rgb
                 self.actual_button_color = self.on_click_button_rgb

@@ -40,10 +40,10 @@ class StartGameScene(Scene):
 
         self.offset = 0
         self.original_maps_images = [Image(Vector2d(350, 116 + (i % 3) * 150 + (i % 3) * 16), 150, 150, self.screen,
-                                           f'resources/ORIGINAL/LEVELS/Level{i + 1}.bmp') for i in range(0, 30)]
+                                           f'resources/maps/Level{i + 1}.png') for i in range(0, 18)]
 
         self.original_maps_start_buttons = [Button(Vector2d(350, 116 + (i % 3) * 150 + (i % 3) * 16), 150, 150, f'{i}',
-                                                   self.screen) for i in range(0, 30)]
+                                                   self.screen) for i in range(0, 18)]
 
         self.prev_image = Image(Vector2d(525, 200), 100, 50, self.screen, f'resources/menu/left.png')
         self.next_image = Image(Vector2d(525, 414), 100, 50, self.screen, f'resources/menu/right.png')
@@ -119,6 +119,7 @@ class StartGameScene(Scene):
 
         act1, act2, act3 = self.offset * 3, self.offset * 3 + 1, self.offset * 3 + 2
         for i in range(self.offset * 3, self.offset * 3 + 3):
+            #print(i)
             image_to_draw[i].draw()
 
             buttons_to_click[i].set_action(lambda: self.launch_game(act1))

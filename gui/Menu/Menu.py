@@ -22,7 +22,7 @@ class Menu:
         self.screen = screen
 
         # Background
-        self.background_image = pygame.transform.scale(pygame.image.load("resources/ORIGINAL/LEVELS/Level01.bmp"),
+        self.background_image = pygame.transform.scale(pygame.image.load("resources/maps/Level1.png"),
                                                        (self.width, self.height))
         self.scenes = [MainMenuScene(self.screen), StartGameScene(self.screen), LevelCreatorScene(self.screen),
                        InstructionScene(self.screen), LeaderScene(self.screen), SettingsScene(self.screen),

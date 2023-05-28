@@ -8,20 +8,26 @@ from gui.TextureFactory import *
 from Utility.Engine import *
 from MapElements.MapElement import *
 from Maps.GameMap import *
-from Maps.Level01 import *
-from Maps.Level02 import *
-from Maps.Level03 import *
-from Maps.Level04 import *
-from Maps.Level05 import *
-from Maps.Level06 import *
-from Maps.Level07 import *
-from Maps.Level08 import *
-from Maps.Level09 import *
-from Maps.Level10 import *
-from Maps.Level11 import *
+from Maps.Level01 import Level01
+from Maps.Level02 import Level02
+from Maps.Level03 import Level03
+from Maps.Level04 import Level04
+from Maps.Level05 import Level05
+from Maps.Level06 import Level06
+from Maps.Level07 import Level07
+from Maps.Level08 import Level08
+from Maps.Level09 import Level09
+from Maps.Level10 import Level10
+from Maps.Level11 import Level11
+from Maps.Level12 import Level12
+from Maps.Level13 import Level13
+from Maps.Level14 import Level14
+from Maps.Level15 import Level15
+from Maps.Level16 import Level16
 
 from Enums.TileType import *
 from enum import Enum
+from Enums.RenderType import RenderType
 
 
 class APPEVENT(Enum):
@@ -36,16 +42,18 @@ class App:
         # Init pygame
         pygame.init()
 
-        self.__TEXTURE_FACTORY = TextureFactory()
-        # This value will be parameterized in the future
-        self.MAX_ROW = 17
-        self.MAX_COL = 17
         self.FIELD_SIZE = 42
+        self.__TEXTURE_FACTORY = TextureFactory(self.FIELD_SIZE)
 
-        # Place for future scene (MENU...)
+        # This value will be parameterized in the future. These are max rows and cols that can be shown
+        self.MAX_SHOWN_ROWS = 17
+        self.MAX_SHOWN_Y = self.MAX_SHOWN_ROWS*self.FIELD_SIZE
+        self.MAX_SHOWN_COLS = 17
+        self.MAX_SHOWN_X = self.MAX_SHOWN_COLS * self.FIELD_SIZE
 
         # Window (screen)
-        self.window = pygame.display.set_mode((self.MAX_COL * self.FIELD_SIZE, (self.MAX_ROW + 2) * self.FIELD_SIZE))
+        self.window = pygame.display.set_mode((self.MAX_SHOWN_COLS * self.FIELD_SIZE, (self.MAX_SHOWN_ROWS + 2) * self.FIELD_SIZE))
+        self.__render_type = None #Has to be assigned in launch game -> It changed the way stuff is drawn on the screen
 
         # FONT
         pygame.font.init()
@@ -68,11 +76,16 @@ class App:
         self.fps = 60
         self.timer = pygame.time.Clock()
 
+        # For rendering with centered pacman
+        self.PACMAN_SCREEN_X = self.MAX_SHOWN_COLS * self.FIELD_SIZE / 2 - self.FIELD_SIZE / 2
+        self.PACMAN_SCREEN_Y = self.MAX_SHOWN_ROWS * self.FIELD_SIZE / 2 - self.FIELD_SIZE / 2
+        self.__PACMAN = None  # We need to keep track of pacman pos
+
         # Launch game
         self.app_event = APPEVENT.MENU
         self.game_response = None
-
         self.launch_app()
+
 
     # Clear window
     def clear_map(self):
@@ -80,55 +93,98 @@ class App:
 
     # Draw pacman and monsters
     def draw_map_element(self, element: MapElement):
-        pos_x = element.get_pos_x()
-        pos_y = element.get_pos_y()
+        image = self.__TEXTURE_FACTORY.load(element.get_image_path(),self.FIELD_SIZE,self.FIELD_SIZE)
+        #image_adjusted = pygame.transform.scale(image, (self.FIELD_SIZE, self.FIELD_SIZE))
 
-        image = self.__TEXTURE_FACTORY.load(element.get_image_path())
-        image_adjusted = pygame.transform.scale(image, (self.FIELD_SIZE, self.FIELD_SIZE))
-        self.window.blit(image_adjusted, (pos_x, pos_y))
+        if self.__render_type == RenderType.PACMAN_CENTERED:
+            pacman_pos_x = self.__PACMAN.get_pos_x()
+            pacman_pos_y = self.__PACMAN.get_pos_y()
+            element_pos_x = element.get_pos_x()
+            element_pos_y = element.get_pos_y()
+
+            element_screen_x = element_pos_x - pacman_pos_x + self.PACMAN_SCREEN_X
+            element_screen_y = element_pos_y - pacman_pos_y + self.PACMAN_SCREEN_Y
+
+            #if(element_screen_x <0 or element_screen_x > self.MAX_SHOWN_X
+            #        or element_screen_y < 0 or element_screen_y > self.MAX_SHOWN_Y):
+            #    return #Dont draw if it doesnt fit in the screen
+
+            self.window.blit(image, (element_screen_x, element_screen_y))
+
+        else:
+            pos_x = element.get_pos_x()
+            pos_y = element.get_pos_y()
+            self.window.blit(image, (pos_x, pos_y))
 
     def draw_map(self, game_map: GameMap):
-        # image = self.__TEXTURE_FACTORY.load(map.get_image_path())
-        # image_adjusted = pygame.transform.scale(image,
-        # (self.FIELD_SIZE * self.MAX_ROW, self.FIELD_SIZE * self.MAX_COL))
-        # self.window.blit(image_adjusted, (0, 0))
+        if game_map.RENDER_TYPE == RenderType.SINGLE_IMAGE:
+            map_size_x = self.FIELD_SIZE * game_map.MAX_COL
+            map_size_y = self.FIELD_SIZE * game_map.MAX_ROW
+            self.window.blit(self.__TEXTURE_FACTORY.load(game_map.get_image_path(), map_size_x, map_size_y), (0, 0))
+        else:
+            pacman_pos_x = self.__PACMAN.get_pos_x()
+            pacman_pos_y = self.__PACMAN.get_pos_y()
 
-        for row in range(self.MAX_ROW):
-            for col in range(self.MAX_COL):
-                x, y = col * self.FIELD_SIZE, row * self.FIELD_SIZE
-                type = game_map.TILES[row][col].TYPE
-                if type == TileType.WALL:
-                    self.window.blit(game_map.get_wall_image(), (x, y))
-                elif type == TileType.VOID:
-                    self.window.blit(game_map.get_void_image(), (x, y))
-                elif type == TileType.CROSS:
-                    self.window.blit(game_map.get_cross_image(), (x, y))
+            for row in range(game_map.MAX_ROW):
+                for col in range(game_map.MAX_COL):
+                    tile_pos_x, tile_pos_y = col * self.FIELD_SIZE, row * self.FIELD_SIZE
+
+                    tile_screen_x = tile_pos_x
+                    tile_screen_y = tile_pos_y
+
+                    if self.__render_type == RenderType.PACMAN_CENTERED:
+                        tile_screen_x = tile_pos_x - pacman_pos_x + self.PACMAN_SCREEN_X
+                        tile_screen_y = tile_pos_y - pacman_pos_y + self.PACMAN_SCREEN_Y
+
+                    tile = game_map.TILES[row][col]
+
+                    self.window.blit(self.__TEXTURE_FACTORY.load(tile.get_image_path(),self.FIELD_SIZE,self.FIELD_SIZE),
+                                     (tile_screen_x, tile_screen_y))
 
 
     def draw_items(self, game_map: GameMap):
+        pacman_pos_x = self.__PACMAN.get_pos_x()
+        pacman_pos_y = self.__PACMAN.get_pos_y()
+
         items = game_map.get_items()
-        # keys_to_removed = []
 
         for key in items.keys():
-            # print(key.ROW,key.COL)
             item = items.get(key)
-            # if item.is_active:
-            image = self.__TEXTURE_FACTORY.load(item.get_image_path())
-            image_adjusted = pygame.transform.scale(image, (self.FIELD_SIZE, self.FIELD_SIZE))
-            self.window.blit(image_adjusted, (item.POS_X, item.POS_Y))
 
-            # Engine remembers about clearing their stuff
-            # else:
-            #    keys_to_removed.append(key)
+            item_screen_x = item.POS_X
+            item_screen_y = item.POS_Y
 
-        # for key in keys_to_removed:
-        #    items.pop(key)
+            if self.__render_type == RenderType.PACMAN_CENTERED:
+                item_screen_x = item.POS_X - pacman_pos_x + self.PACMAN_SCREEN_X
+                item_screen_y = item.POS_Y - pacman_pos_y + self.PACMAN_SCREEN_Y
+
+            image = self.__TEXTURE_FACTORY.load(item.get_image_path(),self.FIELD_SIZE,self.FIELD_SIZE)
+
+            self.window.blit(image, (item_screen_x,item_screen_y))
+
+    def draw_portals(self,game_map):
+        pacman_pos_x = self.__PACMAN.get_pos_x()
+        pacman_pos_y = self.__PACMAN.get_pos_y()
+
+        for portal_row,portal_col in game_map.PORTALS:
+            portal_pos_x = portal_col*self.FIELD_SIZE
+            portal_pos_y = portal_row * self.FIELD_SIZE
+
+            portal_screen_x = portal_pos_x
+            portal_screen_y = portal_pos_y
+
+            if self.__render_type == RenderType.PACMAN_CENTERED:
+                portal_screen_x = portal_pos_x - pacman_pos_x + self.PACMAN_SCREEN_X
+                portal_screen_y = portal_pos_y - pacman_pos_y + self.PACMAN_SCREEN_Y
+
+            self.window.blit(self.__TEXTURE_FACTORY.load("resources/tiles/portal.png",self.FIELD_SIZE,self.FIELD_SIZE),
+                                 (portal_screen_x, portal_screen_y))
 
     def draw_pacman_status(self, lives_number: int, score_number: int):
-        start_hearth_position = (10, self.MAX_ROW * self.FIELD_SIZE)  # OFFSET (should be parametrized ?) (???)
-        # print("Draw pacman status", lives_number, score_number)
+        start_hearth_position = (10, self.MAX_SHOWN_ROWS * self.FIELD_SIZE)  # OFFSET (should be parametrized ?) (???)
+
         for i in range(min(lives_number, 5)):  # MAX 5 lives can be showed
-            self.window.blit(self.__TEXTURE_FACTORY.load("resources/items/BonusLife1.png"), start_hearth_position)
+            self.window.blit(self.__TEXTURE_FACTORY.load("resources/items/BonusLife1.png",self.FIELD_SIZE,self.FIELD_SIZE), start_hearth_position)
             start_hearth_position = (start_hearth_position[0] + self.FIELD_SIZE, start_hearth_position[1])
 
         if lives_number > 5:
@@ -136,7 +192,8 @@ class App:
             self.window.blit(img, start_hearth_position)
 
         score_img = self.font.render("SCORE: " + str(score_number), True, "white")
-        self.window.blit(score_img, (self.MAX_COL * (self.FIELD_SIZE - 15), self.MAX_ROW * self.FIELD_SIZE))
+        self.window.blit(score_img, (self.MAX_SHOWN_COLS * (self.FIELD_SIZE - 15), self.MAX_SHOWN_ROWS * self.FIELD_SIZE))
+
 
     #
     # def draw_win_level(self):
@@ -161,7 +218,7 @@ class App:
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 self.event = event
             else:
-                self.event = None
+                self.event = event
 
             self.menu.draw(self.event)
 
@@ -169,11 +226,14 @@ class App:
         level_id = self.GAME_SPEC.get_level_to_play()
         #hardness = self.GAME_SPEC.get_hardness()  # Should do sth to change hardness of the game (number of enemies)            # TODO After map parsing
 
-        levels = [Level01,Level02,Level03,Level04,Level05,Level06,Level07,Level08,Level09,Level10,Level11]
+        levels = [Level01,Level02,Level03,Level04,Level05,Level06,
+                  Level07,Level08,Level09,Level10,Level11,Level12,
+                  Level13,Level14,Level15,Level16]
         actual_level = levels[level_id]
-        game_map = actual_level(self.MAX_ROW, self.MAX_COL, self.FIELD_SIZE)
+        game_map = actual_level(self.FIELD_SIZE)
+        self.__render_type = game_map.RENDER_TYPE
 
-        engine = Engine(game_map, self.MAX_ROW, self.MAX_COL, self, self.__KEYH, self.FIELD_SIZE,
+        engine = Engine(game_map, game_map.MAX_ROW, game_map.MAX_COL, self, self.__KEYH, self.FIELD_SIZE,
                             self.GAME_SPEC)
         return engine.run()
 
@@ -182,10 +242,10 @@ class App:
         if game_response is not None:
             self.GAME_SPEC.set_start_game(False)
 
-        if game_response == STATUS.LVL_WIN and level_id == 10:
+        if game_response == STATUS.LVL_WIN and level_id == 13:
             self.level_status_scene.change_game_status(STATUS.GAME_WIN)
 
-        elif game_response == STATUS.LVL_WIN and level_id < 10:
+        elif game_response == STATUS.LVL_WIN and level_id < 13:
             self.level_status_scene.change_game_status(STATUS.LVL_WIN)
 
         elif game_response == STATUS.LVL_LOSE:
@@ -234,3 +294,6 @@ class App:
             pygame.display.flip()
 
         pygame.quit()
+
+    def assign_pacman(self,pacman):
+        self.__PACMAN = pacman

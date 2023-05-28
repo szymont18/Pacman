@@ -9,5 +9,12 @@ class TileTypeParser:
             return TileType.WALL
         elif type == 2:
             return TileType.CROSS
+        elif type == 3:
+            return TileType.HORIZONTAL_GATE
+        elif type == 4:
+            return TileType.VERTICAL_GATE
+        elif type == 5:
+            return TileType.LAVA
+
         else:
             raise Exception(str(int) + " is not a legal TileType in TileTypeParser/parse")
