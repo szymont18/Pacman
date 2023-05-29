@@ -33,13 +33,19 @@ class LeaderScene(Scene):
 
         self.leader_board_time = self.leader_board.sort_values(by="Time", inplace=False)
         self.leader_board_time.reset_index(drop=True)
+        self.leader_board_time["ind"] = [i + 1 for i in range(len(self.leader_board_time))]
+        new_order = ["ind", "Nick", "Score", "Time"]
+        self.leader_board_time = self.leader_board_time[new_order]
+
         self.leader_board_score = self.leader_board.sort_values(by="Score", ascending=False, inplace=False)
         self.leader_board_score.reset_index(drop=True)
+        self.leader_board_score["ind"] = [i + 1 for i in range(len(self.leader_board_score))]
+        self.leader_board_score = self.leader_board_score[new_order]
 
         self.leader_board = self.leader_board_score.iloc[:10]
-        self.leader_board_pos = Vector2d(335, 132)
+        self.leader_board_pos = Vector2d(335, 112)
 
-        self.col_width = [150, 150, 150]
+        self.col_width = [20,150, 150, 150]
 
         self.row_height = 26
 
@@ -78,6 +84,19 @@ class LeaderScene(Scene):
         self.draw_leader_board()
 
     def change_sort_way(self, new_way):
+
+        self.leader_board = pd.read_csv("resources/leader_board.csv", sep=",")
+
+        self.leader_board_time = self.leader_board.sort_values(by="Time", inplace=False)
+        self.leader_board_time.reset_index(drop=True)
+        self.leader_board_time["ind"] = [i + 1 for i in range(len(self.leader_board_time))]
+        new_order = ["ind","Nick", "Score","Time"]
+        self.leader_board_time = self.leader_board_time[new_order]
+        self.leader_board_score = self.leader_board.sort_values(by="Score", ascending=False, inplace=False)
+        self.leader_board_score.reset_index(drop=True)
+        self.leader_board_score["ind"] = [i + 1 for i in range(len(self.leader_board_score))]
+        self.leader_board_score = self.leader_board_score[new_order]
+
         self.sort_by = new_way
 
         if self.sort_by == SORTED.SCORE:

@@ -138,17 +138,11 @@ class LevelCreatorScene(Scene):
                                     screen, lambda: self.return_to_menu_routine(), font_size=25)
 
         # SIZE
-        self.add_row = Button(Vector2d(self.MENU_ROW_COORD, 12), 100, self.FIELD_SIZE, "Add row",
+        self.add_row = Button(Vector2d(self.MENU_ROW_COORD, 10), 100, self.FIELD_SIZE, "Add row",
                               screen, lambda: self.add_new_row(), font_size=25)
 
-        self.delete_row = Button(Vector2d(self.MENU_ROW_COORD, 127), 100, self.FIELD_SIZE, "Del row",
-                                 screen, lambda: self.change_in_hand(INHAND.DELETE_ROW), font_size=25)
-
-        self.add_col = Button(Vector2d(self.MENU_ROW_COORD, 242), 100, self.FIELD_SIZE, "Add column",
+        self.add_col = Button(Vector2d(self.MENU_ROW_COORD, 262), 100, self.FIELD_SIZE, "Add column",
                               screen, lambda: self.add_new_column(), font_size=25)
-
-        self.delete_col = Button(Vector2d(self.MENU_ROW_COORD, 357), 100, self.FIELD_SIZE, "Del column",
-                                 screen, lambda: self.change_in_hand(INHAND.DELETE_COL), font_size=25)
 
         self.return_button_size = Button(Vector2d(self.MENU_ROW_COORD, 472), 100, self.FIELD_SIZE, "Return",
                                          screen, lambda: self.change_creator_scene(ICREATOR.MAIN), font_size=25)
@@ -191,6 +185,7 @@ class LevelCreatorScene(Scene):
         self.return_to_component = Button(Vector2d(self.MENU_ROW_COORD, 472), 100, self.FIELD_SIZE, "Return",
                                           screen, lambda: self.change_creator_scene(ICREATOR.COMPONENT), font_size=25)
 
+        # Monsters
         self.skull = Button(Vector2d(self.MENU_ROW_COORD, 12), self.FIELD_SIZE, self.FIELD_SIZE, "",
                             screen, lambda: self.change_in_hand(INHAND.SKULL), font_size=25)
         self.skull_image = Image(Vector2d(self.MENU_ROW_COORD, 12), self.FIELD_SIZE, self.FIELD_SIZE,
@@ -214,10 +209,13 @@ class LevelCreatorScene(Scene):
                                              screen, lambda: self.change_creator_scene(ICREATOR.COMPONENT),
                                              font_size=25)
 
+        # Bonuses
         self.dot = Button(Vector2d(self.MENU_ROW_COORD, 6), self.FIELD_SIZE, self.FIELD_SIZE, "",
                           screen, lambda: self.change_in_hand(INHAND.DOT), font_size=25)
         self.dot_image = Image(Vector2d(self.MENU_ROW_COORD, 6), self.FIELD_SIZE, self.FIELD_SIZE,
                                screen, "resources/items/Dot.png")
+        self.dot_button = Button(Vector2d(self.MENU_ROW_COORD + self.FIELD_SIZE, 6), self.FIELD_SIZE, 20,
+                                 "FILL ALL", self.screen, lambda: self.load_white_dots(), font_size=20)
 
         self.red_ball = Button(Vector2d(self.MENU_ROW_COORD, 82), self.FIELD_SIZE, self.FIELD_SIZE, "",
                                screen, lambda: self.change_in_hand(INHAND.REDBALL), font_size=25)
@@ -324,15 +322,12 @@ class LevelCreatorScene(Scene):
         elif self.level_creator_scene == ICREATOR.SIZE:
             self.add_col.draw()
             self.add_row.draw()
-            self.delete_col.draw()
-            self.delete_row.draw()
             self.return_button_size.draw()
 
             self.return_button_size.is_clicked(mouse)
             self.add_col.is_clicked(mouse)
             self.add_row.is_clicked(mouse)
-            self.delete_col.is_clicked(mouse)
-            self.delete_row.is_clicked(mouse)
+
 
         elif self.level_creator_scene == ICREATOR.COMPONENT:
             self.walls.draw()
@@ -384,7 +379,7 @@ class LevelCreatorScene(Scene):
             self.money_image.draw()
             self.nuke_image.draw()
             self.return_button_monsters.draw()
-
+            self.dot_button.draw()
             self.nuke_input.update()
             self.nuke_input.draw()
             self.slow_input.update()
@@ -395,6 +390,7 @@ class LevelCreatorScene(Scene):
             self.money_input.draw()
 
             if mouse is not None and mouse.type == pygame.KEYDOWN and mouse.key == pygame.K_SPACE: return
+            self.dot_button.is_clicked(mouse)
             self.money_input.is_clicked(mouse)
             self.live_input.is_clicked(mouse)
             self.slow_input.is_clicked(mouse)
@@ -443,23 +439,23 @@ class LevelCreatorScene(Scene):
                 elif type == TileType.LAVA:
                     self.screen.blit(self.__lava_image, (x, y))
 
-    def handle_click(self, mouse_pos):
-        def is_occupied(row, col):
-            if row >= self.rows or col >= self.cols: return False
-            occupied = False
-            if self.table.get((row, col)).TYPE != TileType.VOID:
-                occupied = True
-            elif self.red_dots.get((row, col)) is not None:
-                occupied = True if not self.red_dots[(row, col)] else False
-            elif self.dots.get((row, col)) is not None:
-                occupied = True if not self.dots[(row, col)] else False
-            elif self.on_load_monsters.get((row, col)) is not None:
-                occupied = True if not self.on_load_monsters[(row, col)] else False
-            elif self.monster_spawn_tiles.get((row, col)) is not None:
-                occupied = True if not self.monster_spawn_tiles[(row, col)] else False
-            print(occupied)
-            return occupied
+    def is_occupied(self, row, col):
+        if row >= self.rows or col >= self.cols: return False
+        occupied = False
+        if self.table.get((row, col)).TYPE != TileType.VOID:
+            occupied = True
+        elif self.red_dots.get((row, col)) is not None:
+            occupied = True if not self.red_dots[(row, col)] else False
+        elif self.dots.get((row, col)) is not None:
+            occupied = True if not self.dots[(row, col)] else False
+        elif self.on_load_monsters.get((row, col)) is not None:
+            occupied = True if not self.on_load_monsters[(row, col)] else False
+        elif self.monster_spawn_tiles.get((row, col)) is not None:
+            occupied = True if not self.monster_spawn_tiles[(row, col)] else False
+        print(occupied)
+        return occupied
 
+    def handle_click(self, mouse_pos):
         if mouse_pos[1] > self.FIELD_SIZE * self.START_ROWS: return
         mouse_idx = mouse_pos[0] // self.FIELD_SIZE, mouse_pos[1] // self.FIELD_SIZE
         row, col = mouse_idx[1] + self.offset_row, mouse_idx[0] + self.offset_col
@@ -472,7 +468,7 @@ class LevelCreatorScene(Scene):
             self.on_load_monsters[(row, col)] = False
             self.monster_spawn_tiles[(row, col)] = False
         else:
-            if is_occupied(row, col): return
+            if self.is_occupied(row, col): return
 
             if self.in_hand == INHAND.WALL:
                 self.table[(row, col)] = Tile(TileType.WALL)
@@ -681,6 +677,13 @@ class LevelCreatorScene(Scene):
     def return_to_menu_routine(self):
         self.init_map()
         Scene.change_menu_scene(SceneTypes.MAIN)
+
+    def load_white_dots(self):
+        for row in range(self.rows):
+            for col in range(self.cols):
+                if not self.is_occupied(row, col):
+                    self.dots[(row, col)] = True
+
 
     def delete_new_row(self, row):
         pass
