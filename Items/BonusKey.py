@@ -1,9 +1,7 @@
 from Items.Item import Item
 import pygame
 
-
-
-class BonusLife(Item):
+class BonusKey(Item):
     def __init__(self, POS_X, POS_Y, probability, MAP):
         SOLID_AREA = pygame.Rect(5,5,32, 32)
         Item.__init__(self, POS_X, POS_Y, 2, SOLID_AREA, MAP, 4)

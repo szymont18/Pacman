@@ -3,6 +3,7 @@ from time import sleep
 
 import pygame.time
 
+from Maps.UserLevel import UserLevel
 from gui.Menu.Menu import Menu
 from gui.TextureFactory import *
 from Utility.Engine import *
@@ -223,21 +224,30 @@ class App:
             self.menu.draw(self.event)
 
     def launch_game(self):
-        level_id = self.GAME_SPEC.get_level_to_play()
-        #hardness = self.GAME_SPEC.get_hardness()  # Should do sth to change hardness of the game (number of enemies)            # TODO After map parsing
+        self.clear_map()
+        game_map = None
+        if self.GAME_SPEC.pathname is not None:
+            print("Chosed game_map")
+            game_map = UserLevel(self.FIELD_SIZE,self.GAME_SPEC.pathname)
+            self.__render_type = game_map.RENDER_TYPE
 
-        levels = [Level01,Level02,Level03,Level04,Level05,Level06,
-                  Level07,Level08,Level09,Level10,Level11,Level12,
-                  Level13,Level14,Level15,Level16]
-        actual_level = levels[level_id]
-        game_map = actual_level(self.FIELD_SIZE)
-        self.__render_type = game_map.RENDER_TYPE
+        else:
+            level_id = self.GAME_SPEC.get_level_to_play()
+            #hardness = self.GAME_SPEC.get_hardness()  # Should do sth to change hardness of the game (number of enemies)            # TODO After map parsing
+
+            levels = [Level01,Level02,Level03,Level04,Level05,Level06,
+                      Level07,Level08,Level09,Level10,Level11,Level12,
+                      Level13,Level14,Level15,Level16]
+            actual_level = levels[level_id]
+            game_map = actual_level(self.FIELD_SIZE)
+            self.__render_type = game_map.RENDER_TYPE
 
         engine = Engine(game_map, game_map.MAX_ROW, game_map.MAX_COL, self, self.__KEYH, self.FIELD_SIZE,
                             self.GAME_SPEC)
         return engine.run()
 
     def draw_status(self, game_response, level_id):
+
         self.clear_map()
         if game_response is not None:
             self.GAME_SPEC.set_start_game(False)
@@ -261,6 +271,12 @@ class App:
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
 
+                print("jestem tutaj")
+                if self.GAME_SPEC.pathname is not None:
+                    self.GAME_SPEC.pathname = None
+                    self.app_event = APPEVENT.MENU
+                    break
+
                 if self.level_status_scene.status == STATUS.LVL_WIN:
                     self.GAME_SPEC.increment_lvl()
                     self.app_event = APPEVENT.GAME
@@ -268,6 +284,8 @@ class App:
                 else:
                     self.GAME_SPEC.reset()
                     self.app_event = APPEVENT.MENU
+
+
 
     def launch_app(self):
         # Menu and GameStatus

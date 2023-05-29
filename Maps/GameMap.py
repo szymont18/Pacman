@@ -33,7 +33,7 @@ class GameMap(ABC):
         self.ONLOAD_SPAWN_MONSTERS = ONLOAD_SPAWN_MONSTERS  # Monsters that spawn when game starts
         #self.PORTALS = PORTALS
 
-        self.__RED_DOT_POSITIONS = RED_DOT_POSITIONS
+        self.RED_DOT_POSITIONS = RED_DOT_POSITIONS
         self._total_dots = -1  # It's supposed to be a constant, but it can't be set during initialization,
         # so it's not a constant in the end
 
@@ -101,9 +101,9 @@ class GameMap(ABC):
                     self._items[para] = Dot(j * self.FIELD_SIZE, i * self.FIELD_SIZE, self)
 
         self.set_total_dots(len(self._items.keys()) -
-                               len(self.__RED_DOT_POSITIONS))  # The number of white dots is described by this equation
+                            len(self.RED_DOT_POSITIONS))  # The number of white dots is described by this equation
 
-        for para in self.__RED_DOT_POSITIONS:
+        for para in self.RED_DOT_POSITIONS:
             self._items.pop(para)  # Removing the white dot
             self._items[para] = RedBall(para[1] * self.FIELD_SIZE, para[0] * self.FIELD_SIZE,
                                         self)  # Insert Red Dot
@@ -126,10 +126,15 @@ class GameMap(ABC):
 
         self.__void_places[(item.POS_Y, item.POS_X)] = True
 
+    def item_in_square(self, row, col):
+        if (row, col) in self._items: return True
+        else: return False
+
     def add_item(self, item: Item):
         item_coord = (item.POS_Y / self.FIELD_SIZE, item.POS_X / self.FIELD_SIZE)
         self._items[item_coord] = item
-        self.__void_places.pop((item.POS_Y, item.POS_X))
+
+        if (item.POS_Y, item.POS_X) in self.__void_places: self.__void_places.pop((item.POS_Y, item.POS_X))
 
     def get_possible_turns_on(self, row, col):
         if row < 0 or row == self.MAX_ROW or col < 0 or col == self.MAX_COL:

@@ -2,6 +2,7 @@ from ..Components.Image import Image
 from ..Components.Scene import *
 from ..Components.Button import *
 from ..Components.TextArea import *
+import os
 
 
 class MAPTYPE(Enum):
@@ -55,9 +56,10 @@ class StartGameScene(Scene):
 
         #     TODO: AFTER MAP CREATOR MODIFY THIS
 
-        self.todo = TextArea(Vector2d(300, 150), 414, 150, "TO DO", self.screen, rgb=(116, 235, 52),
-                             font_size=50, center_pos=False)
-        self.casual_maps_images = []
+        self.casual_maps_images = [TextArea(Vector2d(350, 116 + (i % 3) * 150 + (i % 3) * 16), 150, 150, file_name[:-4],
+                                            self.screen, rgb=(247, 245, 245),bck_rgb='red', font_size=40) for i, file_name in
+                                   enumerate(os.listdir("resources/usermaps/"))]
+
 
     def draw(self, mouse):
         pygame.draw.rect(self.screen, 'black', self.rectangle_window)
@@ -86,12 +88,24 @@ class StartGameScene(Scene):
 
         else:
             self.return_to_chose_button.draw()
-            self.todo.draw()
+            self.draw_maps(mouse)
+            self.prev_button.draw()
+            self.next_button.draw()
+            self.prev_image.draw()
+            self.next_image.draw()
 
+            self.prev_button.is_clicked(mouse)
+            self.next_button.is_clicked(mouse)
             self.return_to_chose_button.is_clicked(mouse)
 
     def change_map_type(self, new_type):
         self.map_type = new_type
+        if new_type == MAPTYPE.CASUAL:
+            self.casual_maps_images = [
+                TextArea(Vector2d(350, 116 + (i % 3) * 150 + (i % 3) * 16), 150, 150, file_name[:-4],
+                         self.screen, rgb=(247, 245, 245), bck_rgb='red', font_size=40) for i, file_name in
+                enumerate(os.listdir("resources/usermaps/"))]
+
         self.offset = 0
 
     # TODO CHANGE 10 TO PARAMS
@@ -99,10 +113,13 @@ class StartGameScene(Scene):
         if new_offset < 0 or new_offset >= 10: return
         self.offset = new_offset
 
-    @staticmethod
-    def launch_game(game_id):
-        print(f'Start game {game_id}')
-        Scene.GAME_SPEC.set_start_level(game_id)
+    def launch_game(self, game_id):
+        if self.map_type == MAPTYPE.ORIGINAL:
+            print(f'Start game {game_id}')
+            Scene.GAME_SPEC.set_start_level(game_id)
+        else:
+            print(f'Start game {game_id}')
+            Scene.GAME_SPEC.set_pathname("resources/usermaps/"+game_id+".txt")
 
     def draw_maps(self, mouse):
         image_to_draw = []
@@ -113,15 +130,18 @@ class StartGameScene(Scene):
 
         elif self.map_type == MAPTYPE.CASUAL:
             image_to_draw = self.casual_maps_images
-            # buttons_to_click = [] TODO
+            buttons_to_click = self.original_maps_start_buttons
         else:
             return
 
         act1, act2, act3 = self.offset * 3, self.offset * 3 + 1, self.offset * 3 + 2
         for i in range(self.offset * 3, self.offset * 3 + 3):
-            #print(i)
+            if i >= len(image_to_draw): continue
+            # print(i)
             image_to_draw[i].draw()
-
-            buttons_to_click[i].set_action(lambda: self.launch_game(act1))
+            if self.map_type == MAPTYPE.ORIGINAL:
+                buttons_to_click[i].set_action(lambda: self.launch_game(act1))
+            else:
+                buttons_to_click[i].set_action(lambda: self. launch_game(image_to_draw[i].txt))
             buttons_to_click[i].is_clicked(mouse)
             act1, act2 = act2, act3

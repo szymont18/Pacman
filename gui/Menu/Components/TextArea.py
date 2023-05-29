@@ -5,7 +5,7 @@ from MapElements.Vector2d import Vector2d
 
 class TextArea:
     def __init__(self, pos: Vector2d, width, height, txt: str, screen, fontname="comicsanms", font_size=80,
-                 rgb=(196, 191, 37), center_pos=True):
+                 rgb=(196, 191, 37), center_pos=True, bck_rgb = 'black'):
         self.pos = pos
         self.txt = txt
         self.width = width
@@ -19,11 +19,12 @@ class TextArea:
         self.font = pygame.font.SysFont(fontname, font_size)
 
         self.rgb = rgb
+        self.bck_rgb = bck_rgb
 
     def draw(self):
         # text_surface = self.font.render(self.txt, True, self.rgb)
         # text_rect = text_surface.get_rect(center=self.rectangle.center)
-        pygame.draw.rect(self.screen, 'black', self.rectangle, 0, 5)
+        pygame.draw.rect(self.screen, self.bck_rgb, self.rectangle, 0, 5)
 
         # self.screen.blit(text_surface, text_rect)
         if self.center_pos:

@@ -9,7 +9,6 @@ class TileType(Enum):
     VERTICAL_GATE = 4
     LAVA = 5
 
-
     def __str__(self):
         if self == TileType.WALL:
             return "WALL"

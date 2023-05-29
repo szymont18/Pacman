@@ -95,9 +95,10 @@ class Engine(object):
 
     def spawn_monster(self, init_monster_type=None, init_pos_x=None, init_pos_y=None):
         monster = None
-
         # If a monster has been indicated and where it is to spawn, we do not draw a monster, we only place it once
         if init_monster_type is not None and init_pos_x is not None and init_pos_y is not None:
+            print(f'Monster {init_pos_y // self.FIELD_SIZE}, {init_pos_x // self.FIELD_SIZE}')
+
             if init_monster_type == MonsterTypes.SKULL:
                 monster = Skull(init_pos_x, init_pos_y, self.FIELD_SIZE, self.__C_CHECKER, self.__MAP, self,
                                 self.next_monster_id, self.GROW_TIME, self.DIE_TIME, 4, 5)
@@ -354,8 +355,14 @@ class Engine(object):
         actual_bonus = bonus[index]
         actual_probability = chances[index]
 
-        if actual_coordinate is None:
+        print(f'Actual coordinate {actual_coordinate}')
+
+        if actual_coordinate is None or self.__MAP.item_in_square(actual_coordinate[1], actual_coordinate[0]):
+            print("random coordinates")
             actual_coordinate = self.__MAP.get_random_spawn_place()
+        else: actual_coordinate = (self.FIELD_SIZE * actual_coordinate[0], self.FIELD_SIZE * actual_coordinate[1])
+
+
         new_bonus = actual_bonus(actual_coordinate[1], actual_coordinate[0], actual_probability, self.__MAP)
         # new_bonus.set_activity(True)
         self.__MAP.add_item(new_bonus)

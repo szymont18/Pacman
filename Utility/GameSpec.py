@@ -11,6 +11,7 @@ class HARDNESS(Enum):
 class GameSpec:
     def __init__(self):
         self.game_tps = 120
+        self.pathname = None
 
         self.hardness = HARDNESS.MEDIUM
 
@@ -86,3 +87,7 @@ class GameSpec:
 
     def get_start_level(self): return self.start_level
 
+    def set_pathname(self, pathname):
+        self.pathname = pathname
+        self.start_game = True
+        self.to_play_level = 0

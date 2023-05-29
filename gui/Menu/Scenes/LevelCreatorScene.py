@@ -2,7 +2,7 @@ import pygame
 
 from Enums.MonsterTypes import MonsterTypes
 from Enums.TileType import TileType
-from Items.BonusKey import BonusLife
+from Items.BonusLife import BonusLife
 from Items.BonusMoney import BonusMoney
 from Items.Nuke import Nuke
 from Items.Slow import Slow
@@ -135,7 +135,7 @@ class LevelCreatorScene(Scene):
                            screen, lambda: self.check_and_save(), font_size=25)
 
         self.return_button = Button(Vector2d(self.MENU_ROW_COORD, 452), 110, self.FIELD_SIZE, "Return",
-                                    screen, lambda: Scene.change_menu_scene(SceneTypes.MAIN), font_size=25)
+                                    screen, lambda: self.return_to_menu_routine(), font_size=25)
 
         # SIZE
         self.add_row = Button(Vector2d(self.MENU_ROW_COORD, 12), 100, self.FIELD_SIZE, "Add row",
@@ -271,7 +271,25 @@ class LevelCreatorScene(Scene):
                                               font_size=32, rgb=(247, 245, 245))
 
         self.map_name = TextInput(Vector2d(600, 250), 214, 50, screen, font_size=50)
-        self.confirm_button = Button(Vector2d(660, 250), 214, 50, screen, "Save")
+        self.confirm_button = Button(Vector2d(660, 250), 214, 50, "Save",screen, lambda: self.save_to_file())
+
+    def init_map(self):
+        self.rows = 17
+        self.cols = 17
+
+        self.offset_row = 0
+        self.offset_col = 0
+
+        self.in_hand = None
+        self.level_creator_scene = ICREATOR.MAIN
+        self.table = {(row, col): Tile(TileType.VOID) for col in range(self.cols) for row in range(self.rows)}
+        self.bonus_probabilities = {}
+        self.on_load_monsters = {}
+        self.monster_spawn_tiles = {}
+        self.dots = {}
+        self.red_dots = {}
+        self.pacman_x = None
+        self.pacman_y = None
 
     def draw(self, mouse):
         self.screen.fill((0, 0, 0))
@@ -382,9 +400,9 @@ class LevelCreatorScene(Scene):
             self.slow_input.is_clicked(mouse)
             self.nuke_input.is_clicked(mouse)
             self.dot.is_clicked(mouse)
+            self.live.is_clicked(mouse)
             self.red_ball.is_clicked(mouse)
             self.money.is_clicked(mouse)
-
             self.slow.is_clicked(mouse)
             self.nuke.is_clicked(mouse)
             self.return_button_monsters.is_clicked(mouse)
@@ -404,6 +422,8 @@ class LevelCreatorScene(Scene):
             self.map_name.update()
             self.map_name.draw()
             self.save_map_announcement.draw()
+            self.confirm_button.draw()
+            self.confirm_button.is_clicked(mouse)
 
         if mouse is not None and mouse.type == pygame.MOUSEBUTTONDOWN:
             self.handle_click(pygame.mouse.get_pos())
@@ -425,24 +445,26 @@ class LevelCreatorScene(Scene):
 
     def handle_click(self, mouse_pos):
         def is_occupied(row, col):
+            if row >= self.rows or col >= self.cols: return False
             occupied = False
             if self.table.get((row, col)).TYPE != TileType.VOID:
-                print("occupied")
                 occupied = True
-            elif not self.red_dots.get((row, col)) and self.red_dots.get((row, col)) is not None:
-                occupied = True
-            elif not self.dots.get((row, col)) and self.dots.get((row, col)) is not None:
-                occupied = True
-            elif not self.on_load_monsters.get((row, col)) and self.on_load_monsters.get((row, col)) is not None:
-                occupied = True
-            elif not self.monster_spawn_tiles.get((row, col)) and self.monster_spawn_tiles.get((row, col)) is not None:
-                occupied = True
+            elif self.red_dots.get((row, col)) is not None:
+                occupied = True if not self.red_dots[(row, col)] else False
+            elif self.dots.get((row, col)) is not None:
+                occupied = True if not self.dots[(row, col)] else False
+            elif self.on_load_monsters.get((row, col)) is not None:
+                occupied = True if not self.on_load_monsters[(row, col)] else False
+            elif self.monster_spawn_tiles.get((row, col)) is not None:
+                occupied = True if not self.monster_spawn_tiles[(row, col)] else False
+            print(occupied)
             return occupied
 
         if mouse_pos[1] > self.FIELD_SIZE * self.START_ROWS: return
         mouse_idx = mouse_pos[0] // self.FIELD_SIZE, mouse_pos[1] // self.FIELD_SIZE
         row, col = mouse_idx[1] + self.offset_row, mouse_idx[0] + self.offset_col
-        print(f'Row = {row}; col = {col}')
+        print(f'Row = {row}; col = {col}; inhand = {self.in_hand}')
+
         if self.in_hand == INHAND.VOID:
             self.table[(row, col)] = Tile(TileType.VOID)
             self.red_dots[(row, col)] = False
@@ -456,6 +478,8 @@ class LevelCreatorScene(Scene):
                 self.table[(row, col)] = Tile(TileType.WALL)
             elif self.in_hand == INHAND.CROSS:
                 self.table[(row, col)] = Tile(TileType.CROSS)
+            elif self.in_hand == INHAND.LAVA:
+                self.table[(row, col)] = Tile(TileType.LAVA)
             elif self.in_hand == INHAND.GHOST:
                 self.on_load_monsters[(row, col)] = MonsterTypes.GHOST
             elif self.in_hand == INHAND.DEMON:
@@ -469,13 +493,13 @@ class LevelCreatorScene(Scene):
             elif self.in_hand == INHAND.REDBALL:
                 self.red_dots[(row, col)] = True
             elif self.in_hand == INHAND.SLOW:
-                self.add_bonus_prob(Slow, row, col, self.slow_input.text)
+                self.add_bonus_prob(Slow.__name__, row, col, self.slow_input.text)
             elif self.in_hand == INHAND.BONUSLIFE:
-                self.add_bonus_prob(BonusLife, row, col, self.live_input.text)
+                self.add_bonus_prob(BonusLife.__name__, row, col, self.live_input.text)
             elif self.in_hand == INHAND.NUKE:
-                self.add_bonus_prob(Nuke, row, col, self.nuke_input.text)
+                self.add_bonus_prob(Nuke.__name__, row, col, self.nuke_input.text)
             elif self.in_hand == INHAND.BONUSMONEY:
-                self.add_bonus_prob(BonusMoney, row, col, self.money_input.text)
+                self.add_bonus_prob(BonusMoney.__name__, row, col, self.money_input.text)
             elif self.in_hand == INHAND.DELETE_ROW:
                 self.delete_new_row(row)
             elif self.in_hand == INHAND.DELETE_COL:
@@ -494,14 +518,18 @@ class LevelCreatorScene(Scene):
             self.screen.blit(self.__pacman_image, (x, y))
 
     def draw_items(self):
-        for (row, col) in self.dots.keys():
+        for pos, flag in self.dots.items():
+            if not flag: continue
+            row, col = pos
             if not (self.offset_row <= row < self.offset_row + self.START_ROWS): continue
             if not (self.offset_col <= col < self.offset_col + self.START_ROWS): continue
 
             x, y = (col - self.offset_col) * self.FIELD_SIZE, (row - self.offset_row) * self.FIELD_SIZE
             self.screen.blit(self.__dot_image, (x, y))
 
-        for (row, col) in self.red_dots.keys():
+        for pos, flag in self.red_dots.items():
+            if not flag: continue
+            row, col = pos
             if not (self.offset_row <= row < self.offset_row + self.START_ROWS): continue
             if not (self.offset_col <= col < self.offset_col + self.START_ROWS): continue
             x, y = (col - self.offset_col) * self.FIELD_SIZE, (row - self.offset_row) * self.FIELD_SIZE
@@ -514,23 +542,25 @@ class LevelCreatorScene(Scene):
             x, y = (col - self.offset_col) * self.FIELD_SIZE, (row - self.offset_row) * self.FIELD_SIZE
 
             pct_to_blit = None
-            if bonus_type == Slow:
+            if bonus_type == Slow.__name__:
                 pct_to_blit = self.__slow_image
-            elif bonus_type == BonusMoney:
+            elif bonus_type == BonusMoney.__name__:
                 pct_to_blit = self.__money_image
-            elif bonus_type == BonusLife:
+            elif bonus_type == BonusLife.__name__:
                 pct_to_blit = self.__live_image
-            elif bonus_type == Nuke:
+            elif bonus_type == Nuke.__name__:
                 pct_to_blit = self.__nuke_image
 
-            self.screen.blit(pct_to_blit, (x, y))
+            if pct_to_blit is not None: self.screen.blit(pct_to_blit, (x, y))
 
     def draw_monsters(self):
         for pos, monster in self.on_load_monsters.items():
+            if not monster: continue
             row, col = pos
             if not (self.offset_row <= row < self.offset_row + self.START_ROWS): continue
             if not (self.offset_col <= col < self.offset_col + self.START_ROWS): continue
             x, y = (col - self.offset_col) * self.FIELD_SIZE, (row - self.offset_row) * self.FIELD_SIZE
+
             pct_to_blit = None
             if monster == MonsterTypes.SKULL:
                 pct_to_blit = self.__skull_image
@@ -538,9 +568,10 @@ class LevelCreatorScene(Scene):
                 pct_to_blit = self.__ghost_image
             elif monster == MonsterTypes.DEMON:
                 pct_to_blit = self.__demon_image
-            self.screen.blit(pct_to_blit, (x, y))
+            if pct_to_blit is not None: self.screen.blit(pct_to_blit, (x, y))
 
-        for pos in self.monster_spawn_tiles.keys():
+        for pos, flag in self.monster_spawn_tiles.items():
+            if not flag: continue
             row, col = pos
             if not (self.offset_row <= row < self.offset_row + self.START_ROWS): continue
             if not (self.offset_col <= col < self.offset_col + self.START_ROWS): continue
@@ -565,7 +596,8 @@ class LevelCreatorScene(Scene):
         self.in_hand = new_hand
 
     def check_and_save(self):
-        if self.pacman_x is not None and self.pacman_y is not None:
+        if self.pacman_x is not None and self.pacman_y is not None and len(self.bonus_probabilities) > 0\
+                and len(self.monster_spawn_tiles) > 0:
             self.change_creator_scene(ICREATOR.SAVE)
 
     def add_new_column(self):
@@ -598,8 +630,7 @@ class LevelCreatorScene(Scene):
         print(self.rows, self.offset_row, self.cols, self.offset_col)
 
     def save_to_file(self):
-        # TODO SAVE TO FILE
-        pathname = self.map_name.text
+        pathname = "resources/usermaps/"+self.map_name.text+".txt"
         file = open(pathname, "w")
 
         # row, col
@@ -608,14 +639,51 @@ class LevelCreatorScene(Scene):
         # Table
         for row in range(self.rows):
             for col in range(self.cols):
-                file.write(f'{self.table[(row, col)].TYPE} ')
+                file.write(f'{self.table[(row, col)].TYPE.value} ')
             file.write('\n')
 
         # Pacman coord
-        file.write(f'{self.pacman_y} {self.pacman_x}\n')
+        file.write(f'{(self.pacman_y,self.pacman_x)}\n')
+
+        # Dots and RedBall
+        for pos, placed in self.dots.items():
+            if not placed: continue
+            row, col = pos
+            file.write(f'{(row, col)};')
+        file.write("\n")
+
+        for pos, placed in self.red_dots.items():
+            if not placed: continue
+            row, col = pos
+            file.write(f'{(row, col)};')
+        file.write("\n")
+
+        for bonus_type, spec in self.bonus_probabilities.items():
+            prob, (row, col) = spec
+            file.write(f'{(bonus_type, prob, row, col)};')
+        file.write('\n')
+
+        # Monsters
+        for pos, monster_type in self.on_load_monsters.items():
+            if not monster_type: continue
+            row, col = pos
+            file.write(f'{monster_type.value, row, col};')
+        file.write('\n')
+
+        for pos, flag in self.monster_spawn_tiles.items():
+            if not flag: continue
+            row, col = pos
+            file.write(f'{row, col};')
+
+        file.close()
+        self.init_map()
+
+    def return_to_menu_routine(self):
+        self.init_map()
+        Scene.change_menu_scene(SceneTypes.MAIN)
+
     def delete_new_row(self, row):
         pass
 
     def delete_new_col(self, col):
         pass
-
