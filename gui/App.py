@@ -227,7 +227,6 @@ class App:
         self.clear_map()
         game_map = None
         if self.GAME_SPEC.pathname is not None:
-            print("Chosed game_map")
             game_map = UserLevel(self.FIELD_SIZE,self.GAME_SPEC.pathname)
             self.__render_type = game_map.RENDER_TYPE
 
@@ -271,8 +270,8 @@ class App:
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
 
-                print("jestem tutaj")
                 if self.GAME_SPEC.pathname is not None:
+                    self.GAME_SPEC.reset()
                     self.GAME_SPEC.pathname = None
                     self.app_event = APPEVENT.MENU
                     break

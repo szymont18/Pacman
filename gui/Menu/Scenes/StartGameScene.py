@@ -41,7 +41,7 @@ class StartGameScene(Scene):
 
         self.offset = 0
         self.original_maps_images = [Image(Vector2d(350, 116 + (i % 3) * 150 + (i % 3) * 16), 150, 150, self.screen,
-                                           f'resources/maps/Level{i + 1}.png') for i in range(0, 18)]
+                                           f'resources/maps/Level{i + 1}.png') for i in range(0, 15)]
 
         self.original_maps_start_buttons = [Button(Vector2d(350, 116 + (i % 3) * 150 + (i % 3) * 16), 150, 150, f'{i}',
                                                    self.screen) for i in range(0, 18)]

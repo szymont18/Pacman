@@ -21,7 +21,7 @@ class SettingsScene(Scene):
         self.brightness_scroll_bar = ScrollBar(Vector2d(440, 200), 314, 25, self.screen,
                                                SettingsScene.change_brightness)
 
-        self.game_speed_text = TextArea(Vector2d(465, 200), 314, 100, "Hardness", self.screen, rgb=(247, 245, 245),
+        self.game_speed_text = TextArea(Vector2d(465, 200), 314, 100, "Difficulty", self.screen, rgb=(247, 245, 245),
                                         font_size=30)
         self.game_speed_scroll_bar = ScrollBar(Vector2d(530, 200), 314, 25, self.screen,
                                                SettingsScene.change_hardness_rate)
