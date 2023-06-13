@@ -4,6 +4,7 @@ from Items.BonusLife import BonusLife
 from Items.BonusMoney import BonusMoney
 from Items.Nuke import Nuke
 from Items.Slow import Slow
+from MapElements.Skull import Skull
 from Maps.Tile import Tile
 
 
@@ -58,7 +59,7 @@ class MapParser:
     def get_bonus(self, str_bonus):
         bonus_probability = {}
         for bns in str_bonus.split(";")[:-1]:
-            bonus_name, prob, row, col = eval(bns)
+            bonus_name, prob, plc = eval(bns)
             # prob = int(prob)
             # row = int(row)
             # col = int(col)
@@ -72,19 +73,18 @@ class MapParser:
             elif bonus_name == "Nuke":
                 bonus_name = Nuke
 
-            bonus_probability[bonus_name] = (prob, (row, col))
+            bonus_probability[bonus_name] = (prob, plc)
 
         return bonus_probability
 
     def get_on_load_monsters(self, monster_line):
         on_load_monster = []
-        possible_monsters = []
+        possible_monsters = [MonsterTypes.SKULL]
         for monster_spec in monster_line.split(";")[:-1]:
             monster_type, row, col = eval(monster_spec)
             monster_type = MonsterTypes(monster_type)
 
             on_load_monster.append((monster_type, (row, col)))
-            possible_monsters.append(monster_type)
 
         return on_load_monster, possible_monsters
 

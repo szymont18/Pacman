@@ -251,7 +251,7 @@ class App:
         if game_response is not None:
             self.GAME_SPEC.set_start_game(False)
 
-        if game_response == STATUS.LVL_WIN and level_id == 2:  # For presentation change to 2
+        if game_response == STATUS.LVL_WIN and level_id == 15:  # For presentation change to 0
             self.level_status_scene.change_game_status(STATUS.GAME_WIN)
 
         elif game_response == STATUS.LVL_WIN and level_id < 15:
