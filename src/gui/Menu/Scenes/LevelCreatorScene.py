@@ -772,6 +772,7 @@ class LevelCreatorScene(Scene):
 
     def return_to_menu_routine(self):
         self.init_map()
+        self.change_creator_scene(ICREATOR.INTRODUCTION)
         Scene.change_menu_scene(SceneTypes.MAIN)
 
     def load_white_dots(self):
