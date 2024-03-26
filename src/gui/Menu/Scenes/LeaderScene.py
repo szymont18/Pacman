@@ -1,5 +1,9 @@
+from enum import Enum
+
 import pygame
 
+from src.Enums.SceneTypes import SceneTypes
+from src.MapElements.Vector2d import Vector2d
 from ..Components.Image import Image
 from ..Components.Scene import *
 from ..Components.Button import *

@@ -1,12 +1,16 @@
+from enum import Enum
+
 import pygame
 
-from Enums.MonsterTypes import MonsterTypes
-from Enums.TileType import TileType
-from Items.BonusLife import BonusLife
-from Items.BonusMoney import BonusMoney
-from Items.Nuke import Nuke
-from Items.Slow import Slow
-from Maps.Tile import Tile
+from src.Enums.MonsterTypes import MonsterTypes
+from src.Enums.SceneTypes import SceneTypes
+from src.Enums.TileType import TileType
+from src.Items.BonusLife import BonusLife
+from src.Items.BonusMoney import BonusMoney
+from src.Items.Nuke import Nuke
+from src.Items.Slow import Slow
+from src.MapElements.Vector2d import Vector2d
+from src.Maps.Tile import Tile
 from ..Components.Image import Image
 from ..Components.Scene import *
 from ..Components.Button import *

@@ -1,5 +1,4 @@
-from gui.Menu.Components.Scene import Scene
-
+from src.MapElements.Vector2d import Vector2d
 from ..Components.Image import Image
 from ..Components.Scene import *
 from ..Components.Button import *

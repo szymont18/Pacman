@@ -1,6 +1,6 @@
-from MapElements.MapElement import MapElement
-from Enums import Direction as Direction
-from Enums.Direction import *
+from ..MapElements.MapElement import MapElement
+from ..Enums import Direction as Direction
+from ..Enums.Direction import *
 import pygame
 import time
 #from MapElements import MapElement

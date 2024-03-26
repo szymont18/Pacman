@@ -1,5 +1,7 @@
 import pygame
 
+from src.Enums.SceneTypes import SceneTypes
+from src.MapElements.Vector2d import Vector2d
 from .GhostBonusScene import GhostBonusScene
 # TODO: Bonuses and scenes for all bonuses and ghosts
 

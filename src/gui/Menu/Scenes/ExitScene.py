@@ -1,3 +1,4 @@
+from src.MapElements.Vector2d import Vector2d
 from ..Components.Scene import *
 from ..Components.Button import *
 from ..Components.TextArea import *

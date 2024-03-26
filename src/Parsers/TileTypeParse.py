@@ -1,4 +1,4 @@
-from Enums.TileType import *
+from ..Enums.TileType import *
 class TileTypeParser:
 
     @staticmethod

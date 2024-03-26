@@ -1,10 +1,10 @@
-from Maps.GameMap import GameMap
-from Items.BonusLife import BonusLife
-from Items.BonusMoney import BonusMoney
-from Items.Slow import Slow
-from Items.Nuke import Nuke
-from Enums.MonsterTypes import *
-from Enums.RenderType import *
+from ..Maps.GameMap import GameMap
+from ..Items.BonusLife import BonusLife
+from ..Items.BonusMoney import BonusMoney
+from ..Items.Slow import Slow
+from ..Items.Nuke import Nuke
+from ..Enums.MonsterTypes import *
+from ..Enums.RenderType import *
 
 
 class Level05(GameMap):

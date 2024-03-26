@@ -1,6 +1,6 @@
-from Enums import TileType
-from Enums.TileType import *
-from Enums.Direction import *
+from ..Enums import TileType
+from ..Enums.TileType import *
+from ..Enums.Direction import *
 
 
 class Tile:

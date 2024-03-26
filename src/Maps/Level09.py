@@ -1,10 +1,10 @@
-from Maps.GameMap import GameMap
-from Items.Slow import Slow
-from Enums.MonsterTypes import *
-from Items.BonusLife import BonusLife
-from Items.Nuke import Nuke
-from Items.BonusMoney import BonusMoney
-from Enums.RenderType import *
+from ..Maps.GameMap import GameMap
+from ..Items.Slow import Slow
+from ..Enums.MonsterTypes import *
+from ..Items.BonusLife import BonusLife
+from ..Items.Nuke import Nuke
+from ..Items.BonusMoney import BonusMoney
+from ..Enums.RenderType import *
 
 class Level09(GameMap):
     def __init__(self,field_size):

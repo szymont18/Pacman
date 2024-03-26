@@ -1,16 +1,15 @@
 
 import pygame
 
-from Enums.SceneTypes import SceneTypes
-from gui.Menu.Components.Scene import Scene
-from gui.Menu.Scenes.ExitScene import ExitScene
-from gui.Menu.Scenes.InstructionScene import InstructionScene
-from gui.Menu.Scenes.LeaderScene import LeaderScene
-from gui.Menu.Scenes.LevelCreatorScene import LevelCreatorScene
-from gui.Menu.Scenes.LevelStatusScene import LevelStatusScene
-from gui.Menu.Scenes.MainMenuScene import MainMenuScene
-from gui.Menu.Scenes.SettingsScene import SettingsScene
-from gui.Menu.Scenes.StartGameScene import StartGameScene
+from src.Enums.SceneTypes import SceneTypes
+from src.gui.Menu.Components.Scene import Scene
+from src.gui.Menu.Scenes.ExitScene import ExitScene
+from src.gui.Menu.Scenes.InstructionScene import InstructionScene
+from src.gui.Menu.Scenes.LeaderScene import LeaderScene
+from src.gui.Menu.Scenes.LevelCreatorScene import LevelCreatorScene
+from src.gui.Menu.Scenes.MainMenuScene import MainMenuScene
+from src.gui.Menu.Scenes.SettingsScene import SettingsScene
+from src.gui.Menu.Scenes.StartGameScene import StartGameScene
 
 
 class Menu:

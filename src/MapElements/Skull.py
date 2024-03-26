@@ -1,9 +1,8 @@
 import random
 
-from MapElements.MapElement import MapElement
-from Enums import Direction as Direction
-from Enums.Direction import *
-import numpy as np
+from ..MapElements.MapElement import MapElement
+from ..Enums import Direction as Direction
+from ..Enums.Direction import *
 import time
 import pygame
 

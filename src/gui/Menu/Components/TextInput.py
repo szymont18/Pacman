@@ -1,7 +1,8 @@
-from MapElements.Vector2d import Vector2d
+
 import pygame
 
-from gui.Menu.Components.Scene import Scene
+from src.MapElements.Vector2d import Vector2d
+from src.gui.Menu.Components.Scene import Scene
 
 
 class TextInput:

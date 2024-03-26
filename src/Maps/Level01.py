@@ -1,9 +1,9 @@
-from Maps.GameMap import GameMap
-from Items.BonusLife import BonusLife
-from Items.BonusMoney import BonusMoney
-from Enums.MonsterTypes import *
+from ..Maps.GameMap import GameMap
+from ..Items.BonusLife import BonusLife
+from ..Items.BonusMoney import BonusMoney
+from ..Enums.MonsterTypes import *
 import pygame
-from Enums.RenderType import *
+from ..Enums.RenderType import *
 
 class Level01(GameMap):
     def __init__(self,field_size):

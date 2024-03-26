@@ -1,26 +1,26 @@
 import random
 import time
+
+import numpy
 import pygame, sys
-from Items.BonusLife import BonusLife
-from Items.BonusMoney import BonusMoney
-from Utility.CollisionChecker import *
-from MapElements.Pacman import Pacman
-from Items.Item import Item
-from Items.Dot import Dot
-from Items.Nuke import Nuke
-from Items.RedBall import RedBall
-from Items.Slow import Slow
-from random import randint
-from numpy.random import randint
-from Enums.MonsterTypes import *
-from MapElements.Skull import *
-from MapElements.Demon import *
-from MapElements.Ghost import *
-from Utility.GameSpec import *
-from Maps.Level04 import Level04
-from Utility.KeyHandler import *
-from MapElements.Pacman import *
-from gui.Menu.Scenes.LevelStatusScene import STATUS, LevelStatusScene
+
+from src.Enums.MonsterTypes import MonsterTypes
+from src.Items.BonusLife import BonusLife
+from src.Items.BonusMoney import BonusMoney
+from src.Items.Dot import Dot
+from src.Items.Item import Item
+from src.Items.Nuke import Nuke
+from src.Items.RedBall import RedBall
+from src.Items.Slow import Slow
+from src.MapElements.Demon import Demon
+from src.MapElements.Ghost import Ghost
+from src.MapElements.MapElement import MapElement
+from src.MapElements.Pacman import Pacman
+from src.MapElements.Skull import Skull
+from src.Maps.Level04 import Level04
+from src.Utility.CollisionChecker import CollisionChecker
+from src.Utility.GameSpec import GameSpec, HARDNESS
+from src.gui.Menu.Scenes.LevelStatusScene import STATUS
 
 
 class Engine(object):
@@ -114,12 +114,12 @@ class Engine(object):
         else:  # Random Monster
             monster_types = self.__MAP.POSSIBLE_MONSTERS
             n1 = len(monster_types)
-            random_id = randint(0, n1)
+            random_id = numpy.random.randint(0, n1)
             monster_type = monster_types[random_id]  # This monster
 
             spawn_tiles = self.__MAP.MONSTER_SPAWN_TILES
             n2 = len(spawn_tiles)
-            random_id = randint(0, n2)
+            random_id = numpy.random.randint(0, n2)
             spawn_tile = spawn_tiles[random_id]  # Coordinates
 
             pos_x = spawn_tile[0] * self.FIELD_SIZE

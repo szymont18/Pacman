@@ -1,11 +1,11 @@
-from Enums.MonsterTypes import MonsterTypes
-from Enums.TileType import TileType
-from Items.BonusLife import BonusLife
-from Items.BonusMoney import BonusMoney
-from Items.Nuke import Nuke
-from Items.Slow import Slow
-from MapElements.Skull import Skull
-from Maps.Tile import Tile
+from ..Enums.MonsterTypes import MonsterTypes
+from ..Enums.TileType import TileType
+from ..Items.BonusLife import BonusLife
+from ..Items.BonusMoney import BonusMoney
+from ..Items.Nuke import Nuke
+from ..Items.Slow import Slow
+from ..MapElements.Skull import Skull
+from ..Maps.Tile import Tile
 
 
 class MapParser:

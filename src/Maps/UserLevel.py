@@ -1,13 +1,13 @@
-from Enums.TileType import TileType
-from Items.Dot import Dot
-from Items.RedBall import RedBall
-from Maps.GameMap import GameMap
-from Items.BonusLife import BonusLife
-from Items.BonusMoney import BonusMoney
-from Enums.MonsterTypes import *
+from ..Enums.TileType import TileType
+from ..Items.Dot import Dot
+from ..Items.RedBall import RedBall
+from ..Maps.GameMap import GameMap
+from ..Items.BonusLife import BonusLife
+from ..Items.BonusMoney import BonusMoney
+from ..Enums.MonsterTypes import *
 import pygame
-from Enums.RenderType import *
-from Parsers.MapParser import MapParser
+from ..Enums.RenderType import *
+from ..Parsers.MapParser import MapParser
 
 
 class UserLevel(GameMap):

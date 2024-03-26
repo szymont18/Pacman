@@ -1,7 +1,7 @@
-from Enums import TileType
-from Enums.TileType import *
-from Enums.Direction import *
-from Maps import Tile
+from ..Enums import TileType
+from ..Enums.TileType import *
+from ..Enums.Direction import *
+from ..Maps import Tile
 
 
 class Horizontal_Gate(Tile):

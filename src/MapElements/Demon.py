@@ -1,8 +1,8 @@
 import random
 
-from Enums import Direction as Direction
-from Enums.Direction import *
-from MapElements.MapElement import MapElement
+from ..Enums import Direction as Direction
+from ..Enums.Direction import *
+from ..MapElements.MapElement import MapElement
 
 
 class Demon(MapElement):

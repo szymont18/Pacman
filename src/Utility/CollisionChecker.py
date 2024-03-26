@@ -1,9 +1,9 @@
 import pygame
 
-from MapElements import MapElement
-from Enums import Direction as Direction
-from Enums.Direction import *
-from Items import Item
+from ..MapElements import MapElement
+from ..Enums import Direction as Direction
+from ..Enums.Direction import *
+from ..Items import Item
 
 
 class CollisionChecker:

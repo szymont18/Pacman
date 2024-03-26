@@ -1,6 +1,7 @@
 import pygame
 import pygame.freetype
-from MapElements.Vector2d import Vector2d
+
+from src.MapElements.Vector2d import Vector2d
 
 
 class TextArea:

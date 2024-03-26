@@ -1,12 +1,12 @@
 import random
 from abc import ABC, abstractmethod
-from Maps import Tile
-from Maps.Tile import *
-from Parsers.TileTypeParse import *
-from Items.Item import *
+from ..Maps import Tile
+from ..Maps.Tile import *
+from ..Parsers.TileTypeParse import *
+from ..Items.Item import *
 import pygame
-from Items.Dot import Dot
-from Items.RedBall import RedBall
+from ..Items.Dot import Dot
+from ..Items.RedBall import RedBall
 
 
 class GameMap(ABC):

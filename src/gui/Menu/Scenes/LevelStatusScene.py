@@ -1,10 +1,13 @@
+from src.MapElements.Vector2d import Vector2d
 from ..Components.Image import Image
 from ..Components.Scene import *
 from ..Components.Button import *
 from ..Components.TextArea import *
-from gui.Menu.Components.TextInput import TextInput
+
 
 from enum import Enum
+
+from ..Components.TextInput import TextInput
 
 
 class STATUS(Enum):

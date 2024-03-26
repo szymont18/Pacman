@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
-from Enums import Direction as Direction
-from Enums.Direction import *
+from ..Enums import Direction as Direction
+from ..Enums.Direction import *
 import pygame
 import time
 #from MapElements.Pacman import Pacman

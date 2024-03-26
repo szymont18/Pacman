@@ -1,6 +1,7 @@
 import pygame
 from abc import ABC, abstractmethod
-from Enums.SceneTypes import *
+
+from src.Enums.SceneTypes import SceneTypes
 
 
 class Scene:

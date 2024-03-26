@@ -3,32 +3,35 @@ from time import sleep
 
 import pygame.time
 
-from Maps.UserLevel import UserLevel
-from gui.Menu.Menu import Menu
-from gui.TextureFactory import *
-from Utility.Engine import *
-from MapElements.MapElement import *
-from Maps.GameMap import *
-from Maps.Level01 import Level01
-from Maps.Level02 import Level02
-from Maps.Level03 import Level03
-from Maps.Level04 import Level04
-from Maps.Level05 import Level05
-from Maps.Level06 import Level06
-from Maps.Level07 import Level07
-from Maps.Level08 import Level08
-from Maps.Level09 import Level09
-from Maps.Level10 import Level10
-from Maps.Level11 import Level11
-from Maps.Level12 import Level12
-from Maps.Level13 import Level13
-from Maps.Level14 import Level14
-from Maps.Level15 import Level15
-from Maps.Level16 import Level16
+from .Menu.Scenes.LevelStatusScene import LevelStatusScene, STATUS
+from ..Maps.UserLevel import UserLevel
+from ..Utility.GameSpec import GameSpec
+from ..Utility.KeyHandler import KeyHandler
+from ..gui.Menu.Menu import Menu
+from ..gui.TextureFactory import *
+from ..Utility.Engine import *
+from ..MapElements.MapElement import *
+from ..Maps.GameMap import *
+from ..Maps.Level01 import Level01
+from ..Maps.Level02 import Level02
+from ..Maps.Level03 import Level03
+from ..Maps.Level04 import Level04
+from ..Maps.Level05 import Level05
+from ..Maps.Level06 import Level06
+from ..Maps.Level07 import Level07
+from ..Maps.Level08 import Level08
+from ..Maps.Level09 import Level09
+from ..Maps.Level10 import Level10
+from ..Maps.Level11 import Level11
+from ..Maps.Level12 import Level12
+from ..Maps.Level13 import Level13
+from ..Maps.Level14 import Level14
+from ..Maps.Level15 import Level15
+from ..Maps.Level16 import Level16
 
-from Enums.TileType import *
+from ..Enums.TileType import *
 from enum import Enum
-from Enums.RenderType import RenderType
+from ..Enums.RenderType import RenderType
 
 
 class APPEVENT(Enum):
@@ -70,6 +73,7 @@ class App:
         self.GAME_SPEC = GameSpec()
         self.menu = Menu(714, 798, self.window, self.GAME_SPEC)
         self.level_status_scene = LevelStatusScene(self.window)
+
 
         # Run and mouse event's
         self.KEEP_RUNNING = True

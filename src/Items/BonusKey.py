@@ -1,4 +1,4 @@
-from Items.Item import Item
+import Item
 import pygame
 
 class BonusKey(Item):
